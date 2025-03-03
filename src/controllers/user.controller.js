@@ -1,0 +1,156 @@
+const User = require("../models/user.model.js");
+const {
+  createUserValidation,
+  loginUserValidation,
+} = require("../validation/user.validation.js");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+exports.createUser = async (req, res) => {
+  try {
+    console.log(req.body);
+    const { error } = createUserValidation(req.body);
+
+    if (error) {
+      return res
+        .status(400)
+        .json({ success: false, message: error.details[0].message });
+    }
+
+    const emailAlreadyExist = await User.findOne({ email: req.body.email });
+
+    if (emailAlreadyExist) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email already exists" });
+    }
+
+    //hash password
+
+    const salt = await bcrypt.genSalt(10);
+    req.body.password = await bcrypt.hash(req.body.password, salt);
+
+    const saveUser = await User.create(req.body);
+    if (!saveUser) {
+      return res.status(400).json({
+        success: false,
+        message: "something went wrong in creating user",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Created User successfully",
+      data: { saveUser },
+    });
+  } catch (error) {
+    console.log("somethig wrong", error);
+  }
+};
+
+exports.loginUser = async (req, res) => {
+  // add validation
+  // check email is valid or not
+  // check password is valid or not
+  // return res
+
+  try {
+    const { email, password } = req.body;
+
+    const { error } = loginUserValidation(req.body);
+
+    if (error) {
+      return res
+        .status(400)
+        .json({ success: fasle, message: error.details[0].message });
+    }
+
+    // check email is valid or not
+
+    const verifyEmail = await User.findOne({ email: email, isDeleted: false });
+    if (!verifyEmail) {
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message: "inavlid email or email does not exists",
+        });
+    }
+
+    // compaire password
+    const savedPassword = verifyEmail?.password;
+    const verfiyPassword = await bcrypt.compare(password, savedPassword);
+
+    if (!verfiyPassword) {
+      return res
+        .status(400)
+        .json({ success: false, message: "password does not matched" });
+    }
+
+    // create token
+
+    const token = jwt.sign({userId: verifyEmail?._id}, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE});
+      const userInfo = {
+        token: token,
+        user: verifyEmail,
+      }
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: "login successfully",
+        data: userInfo,
+      });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+
+
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const pageNo = req.query.pageNo;
+    const pageSize = req.query.pageSize;
+    const userList = await User.find({ isDeleted: false }, { password: 0 })
+      .sort({ _id: -1 })
+      .skip((pageNo - 1) * pageSize)
+      .limit(pageSize);
+
+    if (userList.length === 0) {
+      return res
+        .status(200)
+        .json({ success: true, message: "User not found", data: [] });
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "get all list", data: userList });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+exports.getUserByUserId = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    if (!userId) {
+      return res.status(400).json({ message: "user id not found" });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    console.error("something went wrong", error);
+  }
+};
+
+exports.updateUserByUserId = () => {};
+
+exports.deleteUserByUserId = () => {};
