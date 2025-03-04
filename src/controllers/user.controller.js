@@ -5,6 +5,11 @@ const {
 } = require("../validation/user.validation.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+// const otp = require("../helper/generateOTP.js");
+const generateOTP = require("../helper/generateOTP.js")
+
+
+
 exports.createUser = async (req, res) => {
   try {
     console.log(req.body);
@@ -28,6 +33,9 @@ exports.createUser = async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     req.body.password = await bcrypt.hash(req.body.password, salt);
+    const otpCode = generateOTP.generateOTP();
+    console.log(otpCode)
+    req.body.otp = otpCode;
 
     const saveUser = await User.create(req.body);
     if (!saveUser) {
@@ -66,13 +74,13 @@ exports.loginUser = async (req, res) => {
 
     // check email is valid or not
 
-    const verifyEmail = await User.findOne({ email: email, isDeleted: false });
+    const verifyEmail = await User.findOne({ email: email, isDeleted: false, emailVerified: true });
     if (!verifyEmail) {
       return res
         .status(401)
         .json({
           success: false,
-          message: "inavlid email or email does not exists",
+          message: "inavlid email or email not verified",
         });
     }
 
@@ -101,7 +109,7 @@ exports.loginUser = async (req, res) => {
         data: userInfo,
       });
   } catch (error) {
-    console.error(error);
+    console.error("error in login controller",error);
   }
 };
 

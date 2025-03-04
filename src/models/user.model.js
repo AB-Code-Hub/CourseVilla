@@ -44,6 +44,16 @@ const userSchema =  new mongoose.Schema({
     role: {
         type: String,
         default: null
+    },
+
+    otp:{
+        type: String,
+        default: null,
+    },
+
+    emailVerified: {
+        type: Boolean,
+        default: false,
     }
 
 
