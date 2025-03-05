@@ -18,3 +18,14 @@ exports.loginUserValidation = (validator) => {
     })
     return loginUserValidationSchema.validate(validator)
 }
+
+
+exports.updateUserValidation = (validator) => {
+    const updateUserValidationSchema = joi.object({
+        firstName: joi.string().trim().min(3).messages({'string.empty': 'First name cannot be empty or just white spaces'}),
+        lastName: joi.string().allow(null).allow(""),
+        email: joi.string().trim(),
+        password: joi.string().trim().min(6),
+    })
+    return updateUserValidationSchema.validate(validator)
+}

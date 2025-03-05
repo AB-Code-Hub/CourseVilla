@@ -20,7 +20,7 @@ exports.createUser = async (req, res) => {
         .json({ success: false, message: error.details[0].message });
     }
 
-    const emailAlreadyExist = await User.findOne({ email: req.body.email });
+    const emailAlreadyExist = await User.findOne({ email: req.body.email, isDeleted: false});
 
     if (emailAlreadyExist) {
       return res
@@ -185,6 +185,18 @@ exports.updateUserByUserId = async (req, res) => {
   }
 };
 
-exports.deleteUserByUserId = async () => {
+exports.deleteUserByUserId = async (req, res) => {
+        try {
+          const userId = req.userId;
+          if(!userId) return res.status(401).json({message: "User not verified"})
 
+            const deleteUser = await User.findOneAndUpdate({_id: userId, isDeleted: false}, {isDeleted: true}, {new: true})
+
+            if(!deleteUser) return res.status(404).json({message: "User not found"})
+
+              return res.status(200).json({success: true, message: "User deleted successfully", data: {}})
+        } catch (error) {
+          console.error("Error in deleteUserByUserId controller", error)
+          return res.status(500).json({message: "Internal server error", error: error.message})
+        }
 };
