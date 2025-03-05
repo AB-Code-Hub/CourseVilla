@@ -2,6 +2,7 @@ const User = require("../models/user.model.js");
 const {
   createUserValidation,
   loginUserValidation,
+  updateUserValidation,
 } = require("../validation/user.validation.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -158,6 +159,32 @@ exports.getUserByUserId = async (req, res) => {
   }
 };
 
-exports.updateUserByUserId = () => {};
+exports.updateUserByUserId = async (req, res) => {
 
-exports.deleteUserByUserId = () => {};
+  const {firstName, lastName, email, password} = req.body; 
+
+  try {
+   
+         const {error} = updateUserValidation(req.body);
+          console.log(error)
+         if(error) return res.status(400).json({message: error.details[0].message })
+
+    const userId = req.userId;
+
+    const detailfields =  {firstName, lastName, email, password}
+
+      const updatedUser = await User.findOneAndUpdate({_id: userId, isDeleted: false}, detailfields, {new: true})
+
+      if(!updatedUser) return res.status(404).json({message: "User not found"})
+
+        return res.status(200).json({success: true, message: "User updated successfully", data: updatedUser})
+
+  } catch (error) {
+    console.error("Error in updateUserByUserId controller", error)
+    return res.status(500).json({message: "Internal server error", error: error.message})
+  }
+};
+
+exports.deleteUserByUserId = async () => {
+
+};
