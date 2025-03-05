@@ -7,7 +7,7 @@ const { authrization } = require('../middleware/authrization.js');
 router.post('/createUser', userControllers.createUser);
 router.post('/loginUser', userControllers.loginUser);
 router.get('/getAllUsers', authrization, userControllers.getAllUsers);
-router.get('/getUserByUserId/:userId', authrization, userControllers.getUserByUserId);
+router.get('/getUserByUserId/', authrization, userControllers.getUserByUserId);
 router.put('/updateUserByUserId', authrization, userControllers.updateUserByUserId);
 router.delete('/deleteUserByUserId', authrization, userControllers.deleteUserByUserId);
 

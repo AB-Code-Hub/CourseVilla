@@ -6,9 +6,7 @@ const {
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 // const otp = require("../helper/generateOTP.js");
-const generateOTP = require("../helper/generateOTP.js")
-
-
+const generateOTP = require("../helper/generateOTP.js");
 
 exports.createUser = async (req, res) => {
   try {
@@ -34,7 +32,7 @@ exports.createUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     req.body.password = await bcrypt.hash(req.body.password, salt);
     const otpCode = generateOTP.generateOTP();
-    console.log(otpCode)
+    console.log(otpCode);
     req.body.otp = otpCode;
 
     const saveUser = await User.create(req.body);
@@ -74,14 +72,12 @@ exports.loginUser = async (req, res) => {
 
     // check email is valid or not
 
-    const verifyEmail = await User.findOne({ email: email, isDeleted: false, });
+    const verifyEmail = await User.findOne({ email: email, isDeleted: false });
     if (!verifyEmail) {
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message: "inavlid email or email not verified",
-        });
+      return res.status(401).json({
+        success: false,
+        message: "inavlid email or email not verified",
+      });
     }
 
     // compaire password
@@ -96,25 +92,24 @@ exports.loginUser = async (req, res) => {
 
     // create token
 
-    const token = jwt.sign({userId: verifyEmail?._id}, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE});
-      const userInfo = {
-        token: token,
-        user: verifyEmail,
-      }
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: "login successfully",
-        data: userInfo,
-      });
+    const token = jwt.sign(
+      { userId: verifyEmail?._id },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRE }
+    );
+    const userInfo = {
+      token: token,
+      user: verifyEmail,
+    };
+    return res.status(200).json({
+      success: true,
+      message: "login successfully",
+      data: userInfo,
+    });
   } catch (error) {
-    console.error("error in login controller",error);
+    console.error("error in login controller", error);
   }
 };
-
-
-
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -141,21 +136,25 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUserByUserId = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.query.userId;
+    console.log(userId)
+    if (!userId) return res.status(400).json({ message: "User id not found" });
+    const getUserInfo = await User.findOne(
+      { _id: userId, isDeleted: false },
+      { password: 0 }
+    );
+    if (!getUserInfo)
+      return res.status(404).json({ message: "User not found", data: {} });
 
-    if (!userId) {
-      return res.status(400).json({ message: "user id not found" });
-    }
+    return res.status(200).json({success: true, message: "User Details", data: getUserInfo})
 
-    const user = await User.findById(userId);
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
 
-    return res.status(200).json({ success: true, data: user });
   } catch (error) {
-    console.error("something went wrong", error);
+    console.error("Error in getUserByUseId controller", error);
+    return res
+    .status(500)
+    .json({ message: "Internal server error", error: error.message });
   }
 };
 
