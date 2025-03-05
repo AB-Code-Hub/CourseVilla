@@ -10,11 +10,11 @@ const { connectionDB } = require('./src/db/connectiondb');
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
-app.get('/', (req, res) => {
-    res.send("Hello World")
-})
+// app.get('/', (req, res) => {
+//     res.send("Hello World")
+// })
 
-app.use('/api/v1',userRoute)
+app.use('/api/v1', userRoute)
 
 app.listen(port,() => {
     console.log(`Server started on http://localhost:7860`);

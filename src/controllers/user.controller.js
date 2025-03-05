@@ -74,7 +74,7 @@ exports.loginUser = async (req, res) => {
 
     // check email is valid or not
 
-    const verifyEmail = await User.findOne({ email: email, isDeleted: false, emailVerified: true });
+    const verifyEmail = await User.findOne({ email: email, isDeleted: false, });
     if (!verifyEmail) {
       return res
         .status(401)
