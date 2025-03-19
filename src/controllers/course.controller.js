@@ -7,11 +7,16 @@ exports.addCourse = async (req, res) => {
  try{
 
   // add validation
+  const userId = req.userId
   const {error} = addCourseValidation(req.body)
   if(error){
     return res.status(400).json({success: false, message: error.details[0].message, data: {}})
   }
 
+
+  req.body.userId = userId
+
+// check user is User or admin
   const courseSave = await Course.create(req.body)
 
   if(!courseSave)
@@ -28,9 +33,15 @@ exports.addCourse = async (req, res) => {
 
 exports.getAllCourses = async (req, res) => {
   try{
+        const courses = await Course.find({isDeleted: false}).populate('userId', 'firstName email')
+        if(courses.length === 0){
+            return res.status(200).json({success: true, message: "No courses found", data: []})
+        }
 
+        return res.status(200).json({success: true, message: "Courses found successfully", data: courses})
   } catch (err) {
     console.error(err);
+    return res.status(500).json({ message: "Internal server error", error: err.message });
   }
 };
 

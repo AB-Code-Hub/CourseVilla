@@ -11,7 +11,7 @@ const { connectionDB } = require("./src/db/connectiondb");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.use("/api/v1", userRoute);
+app.use("/api/v1/", userRoute);
 app.use("/api/v1/", courseRoute);
 
 app.listen(port, () => {

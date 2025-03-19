@@ -3,13 +3,19 @@ const mongoose = require("mongoose");
 const courseSchema = new mongoose.Schema(
   {
     userId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
       default: null,
     },
 
     name: {
       type: String,
       default: null,
+    },
+
+    isDeleted: { 
+      type: Boolean,
+      default: false,
     },
     description: {
       type: String,

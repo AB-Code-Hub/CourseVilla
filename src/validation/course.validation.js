@@ -7,7 +7,7 @@ exports.addCourseValidation = (validator) => {
         name: joi.string().required().allow(null).allow(""),
         description: joi.string().optional().allow(null).allow(""),
         price: joi.string().required(),
-        image: joi.string().required(),
+        image: joi.string().optional().allow(null).allow(""),
         discount: joi.string().optional().allow(null).allow(""),
         videos: joi.string().optional().allow(null).allow(""),
         topics: joi.string().optional().allow(null).allow(""),
@@ -30,41 +30,3 @@ exports.updateCourseValidation = (validator) => {
     return updateCourseValidationSchema.validate(validator)
 }
 
-
-// {
-//     userId: {
-//       type: String,
-//       default: null,
-//     },
-
-//     name: {
-//       type: String,
-//       default: null,
-//     },
-//     description: {
-//       type: String,
-//       default: null,
-//     },
-//     price: {
-//       type: Number,
-//       deafult: null,
-//     },
-//     discount: {
-//       type: String,
-//       default: null,
-//     },
-//     duration: {
-//       type: String,
-//       default: null,
-//     },
-//     topics: {
-//       type: String,
-//       default: null,
-//     },
-//     videos: [
-//       {
-//         type: Array,
-//         default: null,
-//       },
-//     ],
-//   },
