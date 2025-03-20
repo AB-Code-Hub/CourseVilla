@@ -1,53 +1,117 @@
 const User = require("../models/user.model.js");
-const Course = require('../models/course.model.js');
+const Course = require("../models/course.model.js");
 const { addCourseValidation } = require("../validation/course.validation.js");
 
-
 exports.addCourse = async (req, res) => {
- try{
+  try {
+    // add validation
+    const userId = req.userId;
+    const name = req.body.name?.toLowerCase();
+    const { error } = addCourseValidation(req.body);
+    if (error) {
+      return res
+        .status(400)
+        .json({ success: false, message: error.details[0].message, data: {} });
+    }
 
-  // add validation
-  const userId = req.userId
-  const {error} = addCourseValidation(req.body)
-  if(error){
-    return res.status(400).json({success: false, message: error.details[0].message, data: {}})
-  }
+    // check user is User or admin
 
+    const verifyAdminRole = await User.findOne({
+      _id: userId,
+      isDeleted: false,
+      role: "admin",
+    });
 
-  req.body.userId = userId
+    if (!verifyAdminRole) {
+      return res.status(400).json({
+        success: false,
+        message: "You are not authorized to create course",
+        data: {},
+      });
+    }
 
-// check user is User or admin
-  const courseSave = await Course.create(req.body)
+    // checking Already course created or not
 
-  if(!courseSave)
-  {
-    return res.status(400).json({success: false, message: "Error in creating course", data: {}},)
-  }
+    const courseAlreadyExists = await Course.findOne({
+      name: name,
+      isDeleted: false,
+    });
 
-  return res.status(201).json({success: true, message: "Course created successfully", data: courseSave})
+    if (courseAlreadyExists) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Course already exists", data: {} });
+    }
+    // save course
+    req.body.name = name;
+    req.body.userId = userId;
+    const courseSave = await Course.create(req.body);
 
- } catch (error) {
-    console.log("somethig wrong", error);
+    if (!courseSave) {
+      return res.status(400).json({
+        success: false,
+        message: "Error in creating course",
+        data: {},
+      });
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: "Course created successfully",
+      data: courseSave,
+    });
+  } catch (error) {
+    console.log("error in add course controller", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 };
 
 exports.getAllCourses = async (req, res) => {
-  try{
-        const courses = await Course.find({isDeleted: false}).populate('userId', 'firstName email')
-        if(courses.length === 0){
-            return res.status(200).json({success: true, message: "No courses found", data: []})
-        }
+  try {
+    const pageNo = req.query.pageNo || 1;
+    const pageSize = req.query.pageSize || 10;
+    const totalCourse = await Course.countDocuments({ isDeleted: false });
+    const totalPage = Math.ceil(totalCourse / pageSize);
+    const courses = await Course.find({ isDeleted: false })
 
-        return res.status(200).json({success: true, message: "Courses found successfully", data: courses})
+
+      .populate("userId", "firstName email")
+      .sort({ _id: -1 })
+      .skip((pageNo - 1) * pageSize)
+      .limit(pageSize);
+    if (courses.length === 0) {
+      return res
+        .status(200)
+        .json({ success: true, message: "No courses found", data: [] });
+    }
+
+    const response  = {
+      currentPage: pageNo,
+      pageSize,
+      totalPage,
+      totalCourse,
+      courseList : courses,
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Courses found successfully",
+      data: response,
+    });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: "Internal server error", error: err.message });
+    console.error("Error in course find controller", err);
+    return res
+      .status(500)
+      .json({ message: "Internal server error", error: err.message });
   }
 };
 
 exports.getCourseByCourseId = async (req, res) => {
-  try{
-
+  try {
   } catch (error) {
     console.error("Error in getUserByUseId controller", error);
     return res
@@ -57,10 +121,8 @@ exports.getCourseByCourseId = async (req, res) => {
 };
 
 exports.updateCourseByCourseId = async (req, res) => {
- 
- try {
-
- } catch (error) {
+  try {
+  } catch (error) {
     console.error("Error in updateUserByUserId controller", error);
     return res
       .status(500)
@@ -69,9 +131,8 @@ exports.updateCourseByCourseId = async (req, res) => {
 };
 
 exports.deleteCourseByCourseId = async (req, res) => {
- try{
-
- } catch (error) {
+  try {
+  } catch (error) {
     console.error("Error in deleteUserByUserId controller", error);
     return res
       .status(500)
