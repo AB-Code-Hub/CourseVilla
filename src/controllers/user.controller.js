@@ -20,7 +20,10 @@ exports.createUser = async (req, res) => {
         .json({ success: false, message: error.details[0].message });
     }
 
-    const emailAlreadyExist = await User.findOne({ email: req.body.email, isDeleted: false});
+    const emailAlreadyExist = await User.findOne({
+      email: req.body.email,
+      isDeleted: false,
+    });
 
     if (emailAlreadyExist) {
       return res
@@ -138,7 +141,7 @@ exports.getAllUsers = async (req, res) => {
 exports.getUserByUserId = async (req, res) => {
   try {
     const userId = req.query.userId;
-    console.log(userId)
+    console.log(userId);
     if (!userId) return res.status(400).json({ message: "User id not found" });
     const getUserInfo = await User.findOne(
       { _id: userId, isDeleted: false },
@@ -147,56 +150,74 @@ exports.getUserByUserId = async (req, res) => {
     if (!getUserInfo)
       return res.status(404).json({ message: "User not found", data: {} });
 
-    return res.status(200).json({success: true, message: "User Details", data: getUserInfo})
-
-
-
+    return res
+      .status(200)
+      .json({ success: true, message: "User Details", data: getUserInfo });
   } catch (error) {
     console.error("Error in getUserByUseId controller", error);
     return res
-    .status(500)
-    .json({ message: "Internal server error", error: error.message });
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
 exports.updateUserByUserId = async (req, res) => {
-
-  const {firstName, lastName, email, password} = req.body; 
+  const { firstName, lastName, email, password } = req.body;
 
   try {
-   
-         const {error} = updateUserValidation(req.body);
-          console.log(error)
-         if(error) return res.status(400).json({message: error.details[0].message })
+    const { error } = updateUserValidation(req.body);
+    console.log(error);
+    if (error)
+      return res.status(400).json({ message: error.details[0].message });
 
     const userId = req.userId;
 
-    const detailfields =  {firstName, lastName, email, password}
+    const detailfields = { firstName, lastName, email, password };
 
-      const updatedUser = await User.findOneAndUpdate({_id: userId, isDeleted: false}, detailfields, {new: true})
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId, isDeleted: false },
+      detailfields,
+      { new: true }
+    );
 
-      if(!updatedUser) return res.status(404).json({message: "User not found"})
+    if (!updatedUser)
+      return res.status(404).json({ message: "User not found" });
 
-        return res.status(200).json({success: true, message: "User updated successfully", data: updatedUser})
-
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: "User updated successfully",
+        data: updatedUser,
+      });
   } catch (error) {
-    console.error("Error in updateUserByUserId controller", error)
-    return res.status(500).json({message: "Internal server error", error: error.message})
+    console.error("Error in updateUserByUserId controller", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
 exports.deleteUserByUserId = async (req, res) => {
-        try {
-          const userId = req.userId;
-          if(!userId) return res.status(401).json({message: "User not verified"})
+  try {
+    const userId = req.userId;
+    if (!userId) return res.status(401).json({ message: "User not verified" });
 
-            const deleteUser = await User.findOneAndUpdate({_id: userId, isDeleted: false}, {isDeleted: true}, {new: true})
+    const deleteUser = await User.findOneAndUpdate(
+      { _id: userId, isDeleted: false },
+      { isDeleted: true },
+      { new: true }
+    );
 
-            if(!deleteUser) return res.status(404).json({message: "User not found"})
+    if (!deleteUser) return res.status(404).json({ message: "User not found" });
 
-              return res.status(200).json({success: true, message: "User deleted successfully", data: {}})
-        } catch (error) {
-          console.error("Error in deleteUserByUserId controller", error)
-          return res.status(500).json({message: "Internal server error", error: error.message})
-        }
+    return res
+      .status(200)
+      .json({ success: true, message: "User deleted successfully", data: {} });
+  } catch (error) {
+    console.error("Error in deleteUserByUserId controller", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
+  }
 };
