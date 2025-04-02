@@ -37,17 +37,17 @@ const Header = () => {
   </div>
   <div className="navbar-center hidden lg:flex">
     <ul className="menu menu-horizontal px-1">
-      <li><Link to='/' className='text-base font-semibold'>Home </Link></li>
+      <li><Link to='/' className=' font-medium'>Home </Link></li>
       <li>
-        <Link to="/about"  className='text-base font-semibold'>About</Link>
+        <Link to="/about"  className=' font-medium'>About</Link>
       </li>
-      <li><Link to='/contact'  className='text-base font-semibold'>Contact</Link></li>
-      <li><Link to='/course'  className='text-base font-semibold'>Course</Link></li>
-      <li><Link to='/certificate'  className='text-base font-semibold'>certificate</Link></li>
+      <li><Link to='/contact'  className=' font-medium'>Contact</Link></li>
+      <li><Link to='/course'  className=' font-medium'>Course</Link></li>
+      <li><Link to='/certificate'  className=' font-medium'>certificate</Link></li>
     </ul>
   </div>
   <div className="navbar-end">
-    <Link className="btn className='text-base font-semibold'">Logout</Link>
+    <Link className="btn className=' font-medium">Logout</Link>
   </div>
 </div>
     </div>

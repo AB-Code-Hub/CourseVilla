@@ -26,6 +26,7 @@ export default {
       "garden",
       "forest",
       "aqua",
+      "lofi",
       "pastel",
       "fantasy",
       "wireframe",

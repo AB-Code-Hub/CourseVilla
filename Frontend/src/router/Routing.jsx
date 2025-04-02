@@ -8,7 +8,6 @@ import Certificate from '../pages/certificate'
 import Login from '../auth/Login'
 import Signup from '../auth/Signup'
 import Logout from '../auth/Logout'
-import AuthPage from '../auth/AuthPage'
 
 const Routing = () => {
   return (
