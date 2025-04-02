@@ -1,26 +1,73 @@
-import axios from "axios"
+import axios from "axios";
 
-export const UserLogin = async (data) =>( 
-     await axios.post(`${import.meta.env.SERVER_BASE_URL}/loginUser`, data)
-)
+const SERVER_BASE_URL = import.meta.env.VITE_SERVER_BASE_URL; 
 
-export const UserSignup = async (data) =>( 
-     await axios.post(`${import.meta.env.SERVER_BASE_URL}/createUser`, data)
-)
+export const userLogin = async (data) => {
+  try {
+    const response = await axios.post(`${SERVER_BASE_URL}/loginUser`, data);
+    return response;
+  } catch (error) {
+    console.error("Error in userLogin:", error.response?.data || error.message);
+    throw error;
+  }
+};
 
-export const getAllUsers = async () =>(
-        await axios.get(`${import.meta.env.SERVER_BASE_URL}/getAllUsers`)
-    )
+export const userSignup = async (data) => {
+  try {
+    const response = await axios.post(`${SERVER_BASE_URL}/createUser`, data); 
+    return response;
+  } catch (error) {
+    console.error("Error in userSignup:", error.response?.data || error.message);
+    throw error;
+  }
+};
 
+export const getAllUsers = async () => {
+  try {
+    const response = await axios.get(`${SERVER_BASE_URL}/getAllUsers`);
+    return response;
+  } catch (error) {
+    console.error("Error in getAllUsers:", error.response?.data || error.message);
+    throw error;
+  }
+};
 
-export const getUserDetails = async (id) =>(
-        await axios.get(`${import.meta.env.SERVER_BASE_URL}/getUserByUserId/${id}`)
-    )
+export const getUserDetails = async (id) => {
+  try {
+    const response = await axios.get(`${SERVER_BASE_URL}/getUserByUserId/${id}`);
+    return response;
+  } catch (error) {
+    console.error("Error in getUserDetails:", error.response?.data || error.message);
+    throw error;
+  }
+};
 
-export const updateUserDetails = async (id, data) =>(
-            await axios.put(`${import.meta.env.SERVER_BASE_URL}/updateUserByUserId/${id}`, data)
-      )
+export const updateUserDetails = async (id, data) => {
+  try {
+    const response = await axios.put(`${SERVER_BASE_URL}/updateUserByUserId/${id}`, data);
+    return response;
+  } catch (error) {
+    console.error("Error in updateUserDetails:", error.response?.data || error.message);
+    throw error;
+  }
+};
 
-export const deleteUser = async (id) =>(
-        await axios.delete(`${import.meta.env.SERVER_BASE_URL}/deleteUserByUserId/${id}`)
-)
+export const deleteUser = async (id) => {
+  try {
+    const response = await axios.delete(`${SERVER_BASE_URL}/deleteUserByUserId/${id}`);
+    return response;
+  } catch (error) {
+    console.error("Error in deleteUser:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const logoutUser = async () => {
+  try {
+    const response = await axios.delete(`${SERVER_BASE_URL}/logoutUser`);
+    return response;
+  } catch (error) {
+    console.error("Error in logout:", error.response?.data || error.message);
+    throw error;
+  }
+};

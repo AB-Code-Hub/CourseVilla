@@ -3,9 +3,14 @@ import { Link } from 'react-router-dom';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { FcGoogle } from 'react-icons/fc';
 import { FaGithub } from 'react-icons/fa';
+import { userSignup } from '../service/UserService';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Signup = () => {
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -13,33 +18,76 @@ const Signup = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate(); // Move useNavigate here
+  const { login } = useAuth(); // Assuming you have a login function in your AuthContext 
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); // Clear previous errors
     setIsLoading(true);
-    
+
+
+
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+      setError("All fields are required");
+      setIsLoading(false);
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords don't match");
       setIsLoading(false);
       return;
     }
 
-    if(password.length < 8) {
-      setError("Password must be at least 8 characters long");  
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      setIsLoading(false);
+      return;
     }
 
-    console.log('Signing up with:', { name, email, password });
-    setTimeout(() => setIsLoading(false), 1500);
+    const payload = {
+      firstName,
+      lastName,
+      email,
+      password, // Send the password directly
+    };
+
+
+
+    try {
+      const response = await toast.promise(
+        userSignup(payload), // Ensure correct payload is sent
+        {
+          loading: 'Creating account...',
+          success: 'Account created successfully!',
+          error: 'Failed to create account. Please try again.',
+        }
+      );
+
+      if (response.status === 200) {
+        const token = response.data.data.token;
+        login(token);
+        navigate('/');
+      } else {
+        setError("Failed to create account. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error during signup:", error.response?.data || error.message);
+      setError(error.response?.data?.message || "An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-      <img
-  className="mx-auto h-12 w-auto"
-  src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMjU2M2ViIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTEyIDJhMTAgMTAgMCAxIDAgMTAgMTAgNCA0IDAgMCAxLTUtMSA1LjUgNS41IDAgMCAwLS42LTMuNCA1LjUgNS41IDAgMCAwLS45NS0xLjEgNS41IDUuNSAwIDAgMC0xLjEtLjk1IDUuNSA1LjUgMCAwIDAtMy40LS42IDQgNCAwIDAgMS0xLTV6Ii8+PC9zdmc+"
-  alt="Company Logo"
-/>
+        <img
+          className="mx-auto h-12 w-auto"
+          src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMjU2M2ViIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTEyIDJhMTAgMTAgMCAxIDAgMTAgMTAgNCA0IDAgMCAxLTUtMSA1LjUgNS41IDAgMCAwLS42LTMuNCA1LjUgNS41IDAgMCAwLS45NS0xLjEgNS41IDUuNSA0IDAgMCAwLTEuMS0uOTUgNS41IDUuNSA0IDAgMCAwLTMuNC0uNiA0IDQgMCAwIDEtLTV6Ii8+PC9zdmc+"
+          alt="Company Logo"
+        />
         <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900">
           Create your account
         </h2>
@@ -64,21 +112,39 @@ const Signup = () => {
               </div>
             </div>
           )}
-          
+
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-700">
-                Full name
+              <label htmlFor="firstName" className="block text-sm font-medium text-slate-700">
+                First name
               </label>
               <div className="mt-1">
                 <input
-                  id="name"
-                  name="name"
+                  id="firstName"
+                  name="firstName"
                   type="text"
-                  autoComplete="name"
+                  autoComplete="FirstName"
                   required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-slate-700">
+                Last name
+              </label>
+              <div className="mt-1">
+                <input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  autoComplete="lastName"
+                  required
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
@@ -207,7 +273,7 @@ const Signup = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-600">
               Already have an account?{' '}

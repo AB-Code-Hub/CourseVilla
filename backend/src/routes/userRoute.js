@@ -6,6 +6,7 @@ const { authrization } = require('../middleware/authrization.js');
 
 router.post('/createUser', userControllers.createUser);
 router.post('/loginUser', userControllers.loginUser);
+router.post('/logoutUser', authrization, userControllers.logoutUser);
 router.get('/getAllUsers', authrization, userControllers.getAllUsers);
 router.get('/getUserByUserId', authrization, userControllers.getUserByUserId);
 router.put('/updateUserByUserId', authrization, userControllers.updateUserByUserId);

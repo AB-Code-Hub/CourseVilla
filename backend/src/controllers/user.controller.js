@@ -6,12 +6,11 @@ const {
 } = require("../validation/user.validation.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-// const otp = require("../helper/generateOTP.js");
 const generateOTP = require("../helper/generateOTP.js");
 
 exports.createUser = async (req, res) => {
   try {
-    console.log(req.body);
+    
     const { error } = createUserValidation(req.body);
 
     if (error) {
@@ -31,8 +30,6 @@ exports.createUser = async (req, res) => {
         .json({ success: false, message: "Email already exists" });
     }
 
-    //hash password
-
     const salt = await bcrypt.genSalt(10);
     req.body.password = await bcrypt.hash(req.body.password, salt);
     const otpCode = generateOTP.generateOTP();
@@ -47,10 +44,17 @@ exports.createUser = async (req, res) => {
       });
     }
 
+    const userId = await User.findOne({ email: req.body.email });
+    const token = jwt.sign(
+      { userId: userId?._id },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRE }
+    );
+
     return res.status(200).json({
       success: true,
       message: "Created User successfully",
-      data: { saveUser },
+      data: { saveUser, token: token },
     });
   } catch (error) {
     console.log("somethig wrong", error);
@@ -58,11 +62,6 @@ exports.createUser = async (req, res) => {
 };
 
 exports.loginUser = async (req, res) => {
-  // add validation
-  // check email is valid or not
-  // check password is valid or not
-  // return res
-
   try {
     const { email, password } = req.body;
 
@@ -71,47 +70,51 @@ exports.loginUser = async (req, res) => {
     if (error) {
       return res
         .status(400)
-        .json({ success: fasle, message: error.details[0].message });
+        .json({ success: false, message: error.details[0].message });
     }
-
-    // check email is valid or not
 
     const verifyEmail = await User.findOne({ email: email, isDeleted: false });
     if (!verifyEmail) {
       return res.status(401).json({
         success: false,
-        message: "inavlid email or email not verified",
+        message: "Invalid email or email not verified",
       });
     }
 
-    // compaire password
     const savedPassword = verifyEmail?.password;
-    const verfiyPassword = await bcrypt.compare(password, savedPassword);
+    const verifyPassword = await bcrypt.compare(password, savedPassword);
 
-    if (!verfiyPassword) {
+    if (!verifyPassword) {
       return res
         .status(400)
-        .json({ success: false, message: "password does not matched" });
+        .json({ success: false, message: "Password does not match" });
     }
-
-    // create token
 
     const token = jwt.sign(
       { userId: verifyEmail?._id },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRE }
     );
-    const userInfo = {
-      token: token,
-      user: verifyEmail,
-    };
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
+
     return res.status(200).json({
       success: true,
-      message: "login successfully",
-      data: userInfo,
+      message: "Login successful",
+      data: { user: verifyEmail,  token: token, },
+     
     });
   } catch (error) {
-    console.error("error in login controller", error);
+    console.error("Error in loginUser controller", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 };
 
@@ -219,5 +222,26 @@ exports.deleteUserByUserId = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Internal server error", error: error.message });
+  }
+};
+
+exports.logoutUser = async (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "User logged out successfully",
+    });
+  } catch (error) {
+    console.error("Error in logoutUser controller", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 };
