@@ -5,16 +5,17 @@ import Navbar from "./components/Navbar";
 import Login from "./auth/Login";
 import Signup from "./auth/Signup";
 import Home from "./pages/Home";
-import Logout from "./pages/Logout";
 import About from "./pages/About";
 import Course from "./pages/course";
 import Contact from "./pages/Contact";
 import Certificate from "./pages/certificate";
+import { Toaster } from "react-hot-toast";
 
 
 function App() {
   return (
     <AuthProvider>
+      <Toaster />
       <Router>
         <div className="min-h-screen bg-slate-50">
           <Navbar />
@@ -26,7 +27,7 @@ function App() {
 
               {/* Protected Routes */}
               <Route element={<PrivateRoute />}>
-                <Route path="/logout" element={<Logout />} />
+                
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/course" element={<Course />} />

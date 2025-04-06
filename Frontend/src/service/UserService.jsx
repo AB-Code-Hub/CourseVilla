@@ -2,6 +2,7 @@ import axios from "axios";
 
 const SERVER_BASE_URL = import.meta.env.VITE_SERVER_BASE_URL; 
 
+// User related services
 export const userLogin = async (data) => {
   try {
     const response = await axios.post(`${SERVER_BASE_URL}/loginUser`, data);
@@ -68,6 +69,22 @@ export const logoutUser = async () => {
     return response;
   } catch (error) {
     console.error("Error in logout:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// Course related services
+export const getAllCourses = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await axios.get(`${SERVER_BASE_URL}/getAllCourses`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error in getAllCourses:", error.response?.data || error.message);
     throw error;
   }
 };

@@ -30,7 +30,7 @@ exports.addCourse = async (req, res) => {
       });
     }
 
-    // checking Already course created or not
+    // checking Already course created or not  
 
     const courseAlreadyExists = await Course.findOne({
       name: name,
