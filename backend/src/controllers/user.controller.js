@@ -4,7 +4,7 @@ const {
   loginUserValidation,
   updateUserValidation,
 } = require("../validation/user.validation.js");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcryptjs"); 
 const jwt = require("jsonwebtoken");
 const generateOTP = require("../helper/generateOTP.js");
 

@@ -10,6 +10,8 @@ import Course from "./pages/course";
 import Contact from "./pages/Contact";
 import Certificate from "./pages/certificate";
 import { Toaster } from "react-hot-toast";
+import Admin from "./pages/Admin";
+import NotFound from "./pages/NotFound";
 
 
 function App() {
@@ -24,6 +26,7 @@ function App() {
               {/* Public Routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/notfound" element={<NotFound />} />
 
               {/* Protected Routes */}
               <Route element={<PrivateRoute />}>
@@ -33,6 +36,7 @@ function App() {
                 <Route path="/course" element={<Course />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/certificate" element={<Certificate />} />
+                 <Route  path='/admin' element={<Admin />}/>
               </Route>
 
               {/* 404 Page */}
@@ -40,7 +44,7 @@ function App() {
             path="*" 
             element={
               <Navigate to={
-                localStorage.getItem('token') ? '/' : '/login'
+                localStorage.getItem  ('token') ? '/notfound' : '/notfound'
               } 
               />
             } 

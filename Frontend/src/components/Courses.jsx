@@ -94,14 +94,14 @@ const Courses = ({ courses = [] }) => {
                 
                 {/* Course Details */}
                 <div className="md:w-1/2 p-6 md:p-8 flex flex-col justify-center">
-                  <span className="inline-block px-3 py-1 text-xs font-semibold text-blue-700 bg-blue-100 rounded-full mb-2">
+                  <span className="inline-block px-3 py-1 lg:py-2  text-xs lg:text-lg font-semibold text-blue-700 text-center bg-blue-100 rounded-full mb-2 md:mb-5">
                     {course.category}
                   </span>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{course.title}</h3>
-                  <p className="text-gray-600 mb-4">{course.description}</p>
-                  <div className="mt-auto flex items-center justify-between">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Name: <span className='inline-block px-3 py-1 lg:py-2  text-xs lg:text-lg font-semibold text-blue-700 text-center '> {course.title}</span></h3>
+                  <p className="text-gray-600 text-base lg:text-lg mb-4">description: <span className='inline-block px-3 py-1 lg:py-2  text-xs lg:text-base font-semibold text-blue-700 text-center  mb-2'>{course.description}</span></p>
+                  <div className="mt-auto flex items-center justify-around">
                     <span className="text-lg font-semibold text-blue-600">
-                      {course.price}
+                      <span className='text-black text-base lg:text-lg'>Price: </span>{course.price}
                     </span>
                     <Link 
                       to={`/course/${course.id}`}
