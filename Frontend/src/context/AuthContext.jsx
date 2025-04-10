@@ -5,6 +5,7 @@ import {
   useEffect,
   useCallback,
 } from "react";
+import { userProfile } from "../service/UserService";
 
 const AuthContext = createContext();
 
@@ -12,6 +13,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userRole, setUserRole] = useState(null);
+  const [userData, setUserData] = useState(null)
 
   const decodeToken = useCallback((token) => {
     if (!token) return null;
@@ -34,6 +36,25 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(false);
   }, [decodeToken]);
 
+  useEffect(() => {
+    const user = async () => {
+      try {
+        const response = await userProfile()
+
+        if(response.status === 200){
+          console.log(response.data);
+          setUserData(response.data)
+        }
+        
+      } catch (error) {
+        
+      }
+    }
+    user()
+  },
+
+  [])
+
   const login = (token) => {
     localStorage.setItem("token", token);
     setIsAuthenticated(true);
@@ -54,6 +75,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         isLoading,
         userRole,
+        userData,
         login,
         logout,
         getToken,

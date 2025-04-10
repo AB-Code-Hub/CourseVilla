@@ -27,7 +27,7 @@ const AdminHeader = () => {
           
           {/* Right Side */}
           <div className="flex items-center space-x-4">
-            <button className="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button className="p-1 relative rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500">
               <span className="sr-only">View notifications</span>
               <BellIcon className="h-6 w-6" />
               <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500"></span>
