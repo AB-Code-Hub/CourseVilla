@@ -44,9 +44,9 @@ exports.createUser = async (req, res) => {
       });
     }
 
-    const userId = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ email: req.body.email });
     const token = jwt.sign(
-      { userId: userId?._id },
+      { userId: user?._id, role: user?.role },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRE }
     );
@@ -91,7 +91,7 @@ exports.loginUser = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: verifyEmail?._id },
+      { userId: verifyEmail?._id, role: verifyEmail?.role },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRE }
     );

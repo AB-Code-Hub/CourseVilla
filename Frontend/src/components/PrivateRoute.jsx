@@ -1,11 +1,17 @@
 import { useAuth } from '../context/AuthContext';
 import { Navigate, Outlet } from 'react-router-dom';
+import LoadingSpinner from '../components/LoadingSpinner';
 
-const PrivateRoute = () => {
-  const { isAuthenticated, loading } = useAuth();
+const PrivateRoute = ({ allowedRoles = [] }) => {
+  const { isAuthenticated, isLoading, userRole } = useAuth();
 
-  if (loading) return <div>Loading...</div>;
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+  if (isLoading) return <LoadingSpinner fullScreen />;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (allowedRoles.length > 0 && !allowedRoles.includes(userRole)) {
+    return <Navigate to="/notfound" replace />;
+  }
+
+  return <Outlet />;
 };
 
 export default PrivateRoute;

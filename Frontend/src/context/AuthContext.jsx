@@ -1,45 +1,73 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
-  
+  const [isLoading, setIsLoading] = useState(true);
+  const [userRole, setUserRole] = useState(null);
 
-  // Check for token on initial load
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsAuthenticated(!!token);
-    setLoading(false);
+  const decodeToken = useCallback((token) => {
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+
+      return payload.role || "user"; // Default to 'user' if no role specified
+    } catch (error) {
+      console.error("Token decoding failed:", error);
+      return null;
+    }
   }, []);
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsAuthenticated(true);
+      setUserRole(decodeToken(token));
+    }
+    setIsLoading(false);
+  }, [decodeToken]);
+
   const login = (token) => {
-    localStorage.setItem('token', token);
+    localStorage.setItem("token", token);
     setIsAuthenticated(true);
+    setUserRole(decodeToken(token));
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setIsAuthenticated(false);
+    setUserRole(null);
   };
 
-  const getToken = () => {
-    return localStorage.getItem('token');
-  };
+  const getToken = () => localStorage.getItem("token");
 
   return (
-    <AuthContext.Provider value={{ 
-      isAuthenticated, 
-      loading, 
-      login, 
-      logout, 
-      getToken 
-    }}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        isLoading,
+        userRole,
+        login,
+        logout,
+        getToken,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};
