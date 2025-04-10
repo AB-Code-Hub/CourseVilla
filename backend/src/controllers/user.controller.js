@@ -3,6 +3,7 @@ const {
   createUserValidation,
   loginUserValidation,
   updateUserValidation,
+  AddUserValidation,
 } = require("../validation/user.validation.js");
 const bcrypt = require("bcryptjs"); 
 const jwt = require("jsonwebtoken");
@@ -259,3 +260,56 @@ exports.profile = async (req, res) => {
     res.status(500).json({message: "Internal server error"})
   }
 }
+
+exports.addUser = async (req, res) => {
+  try {
+    
+    const { error } = AddUserValidation(req.body);
+
+    if (error) {
+      return res
+        .status(400)
+        .json({ success: false, message: error.details[0].message });
+    }
+
+    const emailAlreadyExist = await User.findOne({
+      email: req.body.email,
+      isDeleted: false,
+    });
+
+    if (emailAlreadyExist) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email already exists" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    req.body.password = await bcrypt.hash(req.body.password, salt);
+    const otpCode = generateOTP.generateOTP();
+    console.log(otpCode);
+    req.body.otp = otpCode;
+
+    const saveUser = await User.create(req.body);
+    if (!saveUser) {
+      return res.status(400).json({
+        success: false,
+        message: "something went wrong in creating user",
+      });
+    }
+
+    const user = await User.findOne({ email: req.body.email });
+    const token = jwt.sign(
+      { userId: user?._id, role: user?.role },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRE }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Created User successfully",
+      data: { saveUser, token: token },
+    });
+  } catch (error) {
+    console.log("somethig wrong", error);
+  }
+};

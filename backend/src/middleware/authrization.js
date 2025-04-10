@@ -14,9 +14,9 @@ exports.authrization = async (req, res, next) => {
         if(!verifiedToken){
             return res.status(403).json({message: "Invalid token"})
         }
-            console.log(verifiedToken);
+            
         req.userId = verifiedToken.userId
-        console.log(verifiedToken.userId);
+       
 
         next()
     } catch (error) {

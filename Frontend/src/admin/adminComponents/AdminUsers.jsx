@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MagnifyingGlassIcon, FunnelIcon, EllipsisVerticalIcon, ArrowPathIcon, PencilSquareIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, PencilSquareIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import toast from 'react-hot-toast';
 import { getAllUsers } from '../../service/UserService';
@@ -19,7 +19,6 @@ const AdminUsers = () => {
         setLoading(true);
         const response = await getAllUsers();
 
-        console.log(response);
         
 
         if (!response || response.length === 0) {
@@ -104,7 +103,7 @@ const AdminUsers = () => {
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
           <Link
-            to="/admin/users/new"
+            to="/admin/users/addUser"
             className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
             Add user
@@ -126,13 +125,7 @@ const AdminUsers = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button
-          type="button"
-          className="inline-flex items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          <FunnelIcon className="mr-2 h-5 w-5 text-slate-400" />
-          Filter
-        </button>
+       
       </div>
 
       {/* Users Table */}

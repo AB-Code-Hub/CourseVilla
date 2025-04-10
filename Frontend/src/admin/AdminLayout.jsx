@@ -1,25 +1,21 @@
 import { Outlet } from 'react-router-dom';
 import AdminSidebar from './AdminSidebar';
 import AdminHeader from './AdminHeader';
-import AdminFooter from './AdminFooter';
-import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
-import { userProfile } from '../service/UserService';
-import LoadingSpinner from '../components/LoadingSpinner';
+import { useState } from 'react';
 
 const AdminLayout = () => {
 
 
- 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
-      <AdminSidebar  />
+      <AdminSidebar  isOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)}  />
       
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <AdminHeader />
+        <AdminHeader toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         
         {/* Content */}
         <main className="flex-1 overflow-y-auto p-6 bg-gray-50">

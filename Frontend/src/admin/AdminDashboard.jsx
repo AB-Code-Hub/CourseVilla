@@ -1,30 +1,115 @@
-import { ChartBarIcon, UsersIcon, BookOpenIcon, AcademicCapIcon } from '@heroicons/react/24/outline';
-
-const stats = [
-  { id: 1, name: 'Total Students', value: '2,345', icon: UsersIcon, change: '+12%', changeType: 'increase' },
-  { id: 2, name: 'Total Courses', value: '56', icon: BookOpenIcon, change: '+5', changeType: 'increase' },
-  { id: 3, name: 'Active Instructors', value: '24', icon: AcademicCapIcon, change: '+3', changeType: 'increase' },
-  { id: 4, name: 'Completion Rate', value: '78%', icon: ChartBarIcon, change: '+4%', changeType: 'increase' },
-];
-
+import {
+  ChartBarIcon,
+  UsersIcon,
+  BookOpenIcon,
+  AcademicCapIcon,
+} from "@heroicons/react/24/outline";
+import { getAllCourses, getAllUsers } from "../service/UserService";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import LoadingSpinner from "../components/LoadingSpinner";
 const recentActivities = [
-  { id: 1, user: 'John Doe', action: 'completed', course: 'React Fundamentals', time: '2h ago' },
-  { id: 2, user: 'Jane Smith', action: 'enrolled in', course: 'Advanced JavaScript', time: '5h ago' },
-  { id: 3, user: 'Alex Johnson', action: 'completed', course: 'UI/UX Design', time: '1d ago' },
-  { id: 4, user: 'Sarah Williams', action: 'started', course: 'Node.js Backend', time: '2d ago' },
+  {
+    id: 1,
+    user: "John Doe",
+    action: "completed",
+    course: "React Fundamentals",
+    time: "2h ago",
+  },
+  {
+    id: 2,
+    user: "Jane Smith",
+    action: "enrolled in",
+    course: "Advanced JavaScript",
+    time: "5h ago",
+  },
+  {
+    id: 3,
+    user: "Alex Johnson",
+    action: "completed",
+    course: "UI/UX Design",
+    time: "1d ago",
+  },
+  {
+    id: 4,
+    user: "Sarah Williams",
+    action: "started",
+    course: "Node.js Backend",
+    time: "2d ago",
+  },
 ];
 
 export default function AdminDashboard() {
+  const [usersData, setUsersData] = useState([]);
+  const [coursesData, setCoursesData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const [usersResponse, coursesResponse] = await Promise.all([
+          getAllUsers(),
+          getAllCourses(),
+        ]);
+
+        if (usersResponse) {
+          setUsersData(usersResponse);
+        }
+
+        console.log(usersResponse);
+        
+
+        if (coursesResponse?.data?.courseList) {
+          setCoursesData(coursesResponse.data.courseList);
+        }
+      } catch (error) {
+        toast.error("Failed to fetch dashboard data");
+        console.error("Dashboard error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const stats = [
+    {
+      id: 1,
+      name: "Total Students",
+      value: isLoading ? <LoadingSpinner /> : usersData?.length || 0,
+      icon: UsersIcon,
+      change: "+12%",
+      changeType: "increase",
+    },
+    {
+      id: 2,
+      name: "Total Courses",
+      value: isLoading ?  <LoadingSpinner /> : coursesData?.length || 0,
+      icon: BookOpenIcon,
+      change: "+5",
+      changeType: "increase",
+    },
+ 
+  ];
+
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2">
         {stats.map((stat) => (
-          <div key={stat.id} className="bg-white overflow-hidden shadow rounded-lg">
+          <div
+            key={stat.id}
+            className="bg-white overflow-hidden shadow rounded-lg"
+          >
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <stat.icon className="h-6 w-6 text-gray-400" aria-hidden="true" />
+                  <stat.icon
+                    className="h-6 w-6 text-gray-400"
+                    aria-hidden="true"
+                  />
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
@@ -40,11 +125,15 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="mt-4">
-                <span className={`text-sm font-medium ${
-                  stat.changeType === 'increase' ? 'text-green-600' : 'text-red-600'
-                }`}>
+                <span
+                  className={`text-sm font-medium ${
+                    stat.changeType === "increase"
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
                   {stat.change}
-                </span>{' '}
+                </span>{" "}
                 <span className="text-sm text-gray-500">since last month</span>
               </div>
             </div>
@@ -56,7 +145,7 @@ export default function AdminDashboard() {
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
         <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
           <h3 className="text-lg leading-6 font-medium text-gray-900">
-            Recent Activity
+            Recent Activity 
           </h3>
         </div>
         <ul className="divide-y divide-gray-200">
@@ -66,7 +155,10 @@ export default function AdminDashboard() {
                 <div className="flex-shrink-0">
                   <img
                     className="h-8 w-8 rounded-full"
-                    src={`https://ui-avatars.com/api/?name=${activity.user.replace(' ', '+')}`}
+                    src={`https://ui-avatars.com/api/?name=${activity.user.replace(
+                      " ",
+                      "+"
+                    )}`}
                     alt=""
                   />
                 </div>

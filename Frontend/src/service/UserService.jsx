@@ -41,10 +41,6 @@ export const getAllUsers = async () => {
 
     
   } catch (error) {
-    console.error(
-      "Error in getAllUsers:",
-      error.response?.data || error.message
-    );
     throw error;
   }
 };
@@ -120,6 +116,26 @@ export const userProfile = async () => {
     throw error;
   }
 };
+
+export const addUser = async (data) => {
+  try {
+    const token = localStorage.getItem("token")
+    const response = await axios.post(`${SERVER_BASE_URL}/addUser`, data,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+    if(response.status === 200){
+      return response.data;
+    }
+
+    
+  } catch (error) {
+    console.log(error);
+    
+  }
+}
 
 // Course related services
 export const getAllCourses = async () => {

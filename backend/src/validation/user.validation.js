@@ -29,3 +29,14 @@ exports.updateUserValidation = (validator) => {
     })
     return updateUserValidationSchema.validate(validator)
 }
+
+exports.AddUserValidation = (validator) => {
+    const AddUserValidationSchema = joi.object({
+        firstName: joi.string().required(),
+        lastName: joi.string().required().allow(null).allow(""),
+        email: joi.string().required(),
+        password: joi.string().required(),
+        role: joi.string().required()
+    })
+    return AddUserValidationSchema.validate(validator)
+}
