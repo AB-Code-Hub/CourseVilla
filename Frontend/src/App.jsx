@@ -11,8 +11,9 @@ import Contact from "./pages/Contact";
 import Certificate from "./pages/certificate";
 import { Toaster } from "react-hot-toast";
 import NotFound from "./pages/NotFound";
-import AdminDashboard from "./layout/AdminDashboard";
-import AdminLayout from "./layout/AdminLayout";
+import AdminDashboard from "./admin/AdminDashboard";
+import AdminLayout from "./admin/AdminLayout";
+import AdminUsers from "./admin/adminComponents/AdminUsers";
 
 // Wrapper component to conditionally render Navbar
 const AppContent = () => {
@@ -43,8 +44,8 @@ const AppContent = () => {
           <Route element={<PrivateRoute allowedRoles={["admin"]} />}>
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
-              {/* <Route path="users" element={<AdminUsers />} />
-              <Route path="courses" element={<AdminCourses />} />
+              <Route path="users" element={<AdminUsers />} />
+              {/* <Route path="courses" element={<AdminCourses />} />
               <Route path="certificates" element={<AdminCertificates />} />
               <Route path="instructors" element={<AdminInstructors />} />
               <Route path="settings" element={<AdminSettings />} /> */}

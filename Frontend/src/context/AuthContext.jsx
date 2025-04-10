@@ -42,12 +42,11 @@ export const AuthProvider = ({ children }) => {
         const response = await userProfile()
 
         if(response.status === 200){
-          console.log(response.data);
           setUserData(response.data)
         }
         
       } catch (error) {
-        
+        console.error(error)
       }
     }
     user()

@@ -28,8 +28,18 @@ export const userSignup = async (data) => {
 
 export const getAllUsers = async () => {
   try {
-    const response = await axios.get(`${SERVER_BASE_URL}/getAllUsers`);
-    return response;
+    const token = localStorage.getItem("token")
+    const response = await axios.get(`${SERVER_BASE_URL}/getAllUsers`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+    if(response.status === 200){
+      return response.data.data;
+    }
+
+    
   } catch (error) {
     console.error(
       "Error in getAllUsers:",
