@@ -1,11 +1,14 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaceFrownIcon, ArrowLeftIcon, HomeIcon } from '@heroicons/react/24/outline';
+import { FaceFrownIcon,  HomeIcon, UserIcon } from '@heroicons/react/24/outline';
+import { useAuth } from '../context/AuthContext';
 
 const NotFound = () => {
   useEffect(() => {
-    document.title = "Page Not Found | YourSiteName";
+    document.title = "CourseVilla";
+    
   }, []);
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -22,7 +25,8 @@ const NotFound = () => {
           Oops! The page you're looking for doesn't exist.
         </p>
         
-        <div className="mt-10 grid grid-cols-1 sm:grid-cols-1 gap-4">
+        {isAuthenticated ? (<>
+          <div className="mt-10 grid grid-cols-1 sm:grid-cols-1 gap-4">
           <Link
             to="/"
             className="flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
@@ -47,6 +51,22 @@ const NotFound = () => {
             </Link>
           </div>
         </div>
+        </>
+        ) : (
+          <>
+             <div className="mt-10 grid grid-cols-1 sm:grid-cols-1 gap-4">
+          <Link
+            to="/login"
+            className="flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
+          >
+            <UserIcon className="h-5 w-5 mr-2" />
+            Go to Login
+          </Link>
+        
+        </div>
+          
+          </>
+        )}
       </div>
     </div>
   );

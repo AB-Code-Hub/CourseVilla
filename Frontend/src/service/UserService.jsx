@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const SERVER_BASE_URL = import.meta.env.VITE_SERVER_BASE_URL; 
+const SERVER_BASE_URL = import.meta.env.VITE_SERVER_BASE_URL;
 
 // User related services
 export const userLogin = async (data) => {
@@ -15,10 +15,13 @@ export const userLogin = async (data) => {
 
 export const userSignup = async (data) => {
   try {
-    const response = await axios.post(`${SERVER_BASE_URL}/createUser`, data); 
+    const response = await axios.post(`${SERVER_BASE_URL}/createUser`, data);
     return response;
   } catch (error) {
-    console.error("Error in userSignup:", error.response?.data || error.message);
+    console.error(
+      "Error in userSignup:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
@@ -28,37 +31,56 @@ export const getAllUsers = async () => {
     const response = await axios.get(`${SERVER_BASE_URL}/getAllUsers`);
     return response;
   } catch (error) {
-    console.error("Error in getAllUsers:", error.response?.data || error.message);
+    console.error(
+      "Error in getAllUsers:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
 
 export const getUserDetails = async (id) => {
   try {
-    const response = await axios.get(`${SERVER_BASE_URL}/getUserByUserId/${id}`);
+    const response = await axios.get(
+      `${SERVER_BASE_URL}/getUserByUserId/${id}`
+    );
     return response;
   } catch (error) {
-    console.error("Error in getUserDetails:", error.response?.data || error.message);
+    console.error(
+      "Error in getUserDetails:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
 
 export const updateUserDetails = async (id, data) => {
   try {
-    const response = await axios.put(`${SERVER_BASE_URL}/updateUserByUserId/${id}`, data);
+    const response = await axios.put(
+      `${SERVER_BASE_URL}/updateUserByUserId/${id}`,
+      data
+    );
     return response;
   } catch (error) {
-    console.error("Error in updateUserDetails:", error.response?.data || error.message);
+    console.error(
+      "Error in updateUserDetails:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
 
 export const deleteUser = async (id) => {
   try {
-    const response = await axios.delete(`${SERVER_BASE_URL}/deleteUserByUserId/${id}`);
+    const response = await axios.delete(
+      `${SERVER_BASE_URL}/deleteUserByUserId/${id}`
+    );
     return response;
   } catch (error) {
-    console.error("Error in deleteUser:", error.response?.data || error.message);
+    console.error(
+      "Error in deleteUser:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 };
@@ -73,18 +95,39 @@ export const logoutUser = async () => {
   }
 };
 
-// Course related services
-export const getAllCourses = async () => {
+export const userProfile = async () => {
   try {
-    const token = localStorage.getItem('token');
-    const response = await axios.get(`${SERVER_BASE_URL}/getAllCourses`, {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(`${SERVER_BASE_URL}/profile`, {
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
-    return response.data;
+
+    return response;
   } catch (error) {
-    console.error("Error in getAllCourses:", error.response?.data || error.message);
+    console.error("Error in profile", error.response?.data || error?.message);
     throw error;
   }
 };
+
+// Course related services
+export const getAllCourses = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await axios.get(`${SERVER_BASE_URL}/getAllCourses`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error in getAllCourses:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+

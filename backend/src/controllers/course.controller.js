@@ -204,3 +204,7 @@ exports.deleteCourseByCourseId = async (req, res) => {
       .json({ message: "Internal server error", error: error.message });
   }
 };
+
+
+
+
