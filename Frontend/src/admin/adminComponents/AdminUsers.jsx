@@ -10,6 +10,7 @@ import LoadingSpinner from "../../components/LoadingSpinner";
 import toast from "react-hot-toast";
 import { getAllUsers } from "../../service/UserService";
 import UserDetailsModal from "./UserDeatilsModal";
+import EditUserModal from "./EditUserModal";
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -17,11 +18,13 @@ const AdminUsers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage] = useState(10);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [editingUserId, setEditingUserId] = useState(null);
+
   const [sortConfig, setSortConfig] = useState({
     key: "name",
     direction: "asc",
   });
-  const [selectedUserId, setSelectedUserId] = useState(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -61,7 +64,7 @@ const AdminUsers = () => {
   // Filter users based on search term
   const filteredUsers = users.filter(
     (user) =>
-      user.name?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+      user.firstName?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
       user.email?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
       user.role?.toLowerCase().includes(searchTerm?.toLowerCase())
   );
@@ -101,10 +104,32 @@ const AdminUsers = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-
   const handleViewUser = (userId) => {
-    setSelectedUserId(userId)
-  }
+    setSelectedUserId(userId);
+  };
+
+  const handleEditUser = (userId) => {
+    setEditingUserId(userId);
+  };
+
+  // Function to refresh user list after edit
+  const handleUserUpdated = (updatedUser) => {
+    setUsers(
+      users.map((user) =>
+        user.id === updatedUser.id
+          ? {
+              ...user,
+              name: updatedUser.firstName,
+              email: updatedUser.email,
+              role: updatedUser.role || user.role,
+              avatar: updatedUser.avatar || user.avatar,
+            }
+          : user
+      )
+    );
+    setEditingUserId(null);
+    toast.success("User updated successfully");
+  };
 
   if (loading) return <LoadingSpinner fullScreen />;
 
@@ -250,7 +275,7 @@ const AdminUsers = () => {
                               className="text-blue-600 hover:text-blue-900"
                               onClick={() => {
                                 /* View action */
-                                handleViewUser(user.id)
+                                handleViewUser(user.id);
                               }}
                             >
                               <EyeIcon className="h-5 w-5" />
@@ -260,6 +285,7 @@ const AdminUsers = () => {
                               className="text-slate-600 hover:text-slate-900"
                               onClick={() => {
                                 /* Edit action */
+                                handleEditUser(user.id);
                               }}
                             >
                               <PencilSquareIcon className="h-5 w-5" />
@@ -377,7 +403,7 @@ const AdminUsers = () => {
                   >
                     <path
                       fillRule="evenodd"
-                      d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l4.5 4.25a.75.75 0 01-1.06.02z"
+                      d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l4.5-4.25a.75.75 0 01-1.06.02z"
                       clipRule="evenodd"
                     />
                   </svg>
@@ -387,9 +413,15 @@ const AdminUsers = () => {
           </div>
         </div>
       )}
-        <UserDetailsModal 
-        userId={selectedUserId} 
-        onClose={() => setSelectedUserId(null)} 
+      <UserDetailsModal
+        userId={selectedUserId}
+        onClose={() => setSelectedUserId(null)}
+      />
+
+      <EditUserModal
+        userId={editingUserId}
+        onClose={() => setEditingUserId(null)}
+        onUserUpdated={handleUserUpdated}
       />
     </div>
   );

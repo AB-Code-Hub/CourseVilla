@@ -70,9 +70,18 @@ export const getUserDetails = async (id) => {
 
 export const updateUserDetails = async (id, data) => {
   try {
+    const token = localStorage.getItem("token");
     const response = await axios.put(
-      `${SERVER_BASE_URL}/updateUserByUserId/${id}`,
-      data
+      `${SERVER_BASE_URL}/updateUserByUserId`,
+      data,
+      {
+        params: {
+          userId: id,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return response;
   } catch (error) {

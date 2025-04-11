@@ -165,23 +165,22 @@ exports.getUserByUserId = async (req, res) => {
 };
 
 exports.updateUserByUserId = async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
-
   try {
     const { error } = updateUserValidation(req.body);
-    console.log(error);
     if (error)
       return res.status(400).json({ message: error.details[0].message });
 
-    const userId = req.userId;
+    const userId = req.query.userId;
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
 
-    const detailfields = { firstName, lastName, email, password };
-
+    // Use the request body directly as the update fields
     const updatedUser = await User.findOneAndUpdate(
       { _id: userId, isDeleted: false },
-      detailfields,
+      req.body,
       { new: true }
-    );
+    ).select('-password'); // Exclude password from response
 
     if (!updatedUser)
       return res.status(404).json({ message: "User not found" });
