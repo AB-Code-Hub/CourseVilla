@@ -145,7 +145,6 @@ exports.getAllUsers = async (req, res) => {
 exports.getUserByUserId = async (req, res) => {
   try {
     const userId = req.query.userId;
-    console.log(userId);
     if (!userId) return res.status(400).json({ message: "User id not found" });
     const getUserInfo = await User.findOne(
       { _id: userId, isDeleted: false },
@@ -250,7 +249,7 @@ exports.logoutUser = async (req, res) => {
 exports.profile = async (req, res) => {
   try {
     const userId = req.userId
-    const user = await User.findById(userId).select("-password")
+    const user = await User.findOne({ _id: userId, isDeleted: false}).select("-password")
     if(!user){
       return res.status(404).json({message: "User not found"})
     }

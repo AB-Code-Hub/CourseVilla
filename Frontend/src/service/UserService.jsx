@@ -47,8 +47,16 @@ export const getAllUsers = async () => {
 
 export const getUserDetails = async (id) => {
   try {
+    const token = localStorage.getItem("token");
     const response = await axios.get(
-      `${SERVER_BASE_URL}/getUserByUserId/${id}`
+      `${SERVER_BASE_URL}/getUserByUserId`, {
+        params: {
+          userId: id,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return response;
   } catch (error) {

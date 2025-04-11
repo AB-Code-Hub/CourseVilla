@@ -1,6 +1,7 @@
 const User = require("../models/user.model.js");
 const Course = require("../models/course.model.js");
 const { addCourseValidation, updateCourseValidation } = require("../validation/course.validation.js");
+const { getIO } = require("../config/socket");
 
 exports.addCourse = async (req, res) => {
   try {
@@ -55,13 +56,21 @@ exports.addCourse = async (req, res) => {
       });
     }
 
+    // Emit new course event
+    const io = getIO();
+    io.emit('newCourse', {
+      course: courseSave.title,
+      action: 'created',
+      time: new Date().toISOString()
+    });
+
     return res.status(201).json({
       success: true,
       message: "Course created successfully",
       data: courseSave,
     });
   } catch (error) {
-    console.log("error in add course controller", error);
+    console.error("Error in addCourse controller:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
