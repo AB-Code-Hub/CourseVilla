@@ -22,13 +22,19 @@ const courseSchema = new mongoose.Schema(
       default: null,
     },
 
-   image: {
-        type: String,
-        default: null,
+    category: {
+      type: String,
+      enum: ['Development', 'Design', 'Business', 'Marketing'],
+      default: null,
+    },
+
+    image: {
+      type: String,
+      default: null,
     },
     price: {
       type: String,
-      deafult: null,
+      default: null,
     },
     discount: {
       type: String,

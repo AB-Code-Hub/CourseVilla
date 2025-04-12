@@ -4,7 +4,7 @@ const joi = require('joi')
 exports.addCourseValidation = (validator) => {
     const addCourseValidationSchema = joi.object({
         userId: joi.string(),
-        name: joi.string().required().allow(null).allow(""),
+        name: joi.string().required(),
         description: joi.string().optional().allow(null).allow(""),
         price: joi.string().required(),
         image: joi.string().optional().allow(null).allow(""),
@@ -12,6 +12,7 @@ exports.addCourseValidation = (validator) => {
         videos: joi.string().optional().allow(null).allow(""),
         topics: joi.string().optional().allow(null).allow(""),
         duration: joi.array().optional().allow(null).allow(""),
+        category: joi.string().required(),
     })
     return addCourseValidationSchema.validate(validator)
 }

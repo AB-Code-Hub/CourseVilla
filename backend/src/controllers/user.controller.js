@@ -202,7 +202,7 @@ exports.updateUserByUserId = async (req, res) => {
 
 exports.deleteUserByUserId = async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.query.userId;
     if (!userId) return res.status(401).json({ message: "User not verified" });
 
     const deleteUser = await User.findOneAndUpdate(

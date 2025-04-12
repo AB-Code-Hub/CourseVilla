@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { getAllUsers } from "../../service/UserService";
 import UserDetailsModal from "./UserDeatilsModal";
 import EditUserModal from "./EditUserModal";
+import DeleteUserModal from "./DelteUserModal";
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -24,6 +25,11 @@ const AdminUsers = () => {
   const [sortConfig, setSortConfig] = useState({
     key: "name",
     direction: "asc",
+  });
+
+  const [deleteState, setDeleteState] = useState({
+    userId: null,
+    userName: "",
   });
 
   useEffect(() => {
@@ -40,13 +46,11 @@ const AdminUsers = () => {
         // Transform API response to match the required format
         const formattedUsers = response.map((user) => ({
           id: user?._id,
-          name: user?.firstName,
+          name: `${user?.firstName}  ${user?.lastName}`,
           email: user?.email,
           role: user?.role || "user",
           lastLogin: user.createdAt || new Date().toISOString(),
-          avatar:
-            user.avatar ||
-            `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`,
+          avatar: `https://ui-avatars.com/api/?name=${user?.firstName?.charAt(0)}${user?.lastName?.charAt(0)}&background=random`,
         }));
 
         setUsers(formattedUsers);
@@ -64,7 +68,7 @@ const AdminUsers = () => {
   // Filter users based on search term
   const filteredUsers = users.filter(
     (user) =>
-      user.firstName?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+      user.name?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
       user.email?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
       user.role?.toLowerCase().includes(searchTerm?.toLowerCase())
   );
@@ -129,6 +133,16 @@ const AdminUsers = () => {
     );
     setEditingUserId(null);
     toast.success("User updated successfully");
+  };
+
+  const handleDeleteClick = (userId, userName) => {
+    setDeleteState({ userId, userName });
+  };
+
+  const handleUserDelte = (deleteUserId) => {
+    setUsers((prevUsers) =>
+      prevUsers.filter((user) => user.id !== deleteUserId)
+    );
   };
 
   if (loading) return <LoadingSpinner fullScreen />;
@@ -256,17 +270,17 @@ const AdminUsers = () => {
                             className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
                               user.role === "admin"
                                 ? "bg-purple-100 text-purple-800"
-                                : user.role === "user"
+                                : user?.role === "user"
                                 ? "bg-blue-100 text-blue-800"
                                 : "bg-green-100 text-green-800"
                             }`}
                           >
-                            {user.role}
+                            {user?.role}
                           </span>
                         </td>
 
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-slate-500">
-                          {formatDate(user.lastLogin)}
+                          {formatDate(user?.lastLogin)}
                         </td>
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                           <div className="flex items-center space-x-2 justify-end sm:justify-center">
@@ -275,7 +289,7 @@ const AdminUsers = () => {
                               className="text-blue-600 hover:text-blue-900"
                               onClick={() => {
                                 /* View action */
-                                handleViewUser(user.id);
+                                handleViewUser(user?.id);
                               }}
                             >
                               <EyeIcon className="h-5 w-5" />
@@ -285,7 +299,7 @@ const AdminUsers = () => {
                               className="text-slate-600 hover:text-slate-900"
                               onClick={() => {
                                 /* Edit action */
-                                handleEditUser(user.id);
+                                handleEditUser(user?.id);
                               }}
                             >
                               <PencilSquareIcon className="h-5 w-5" />
@@ -295,6 +309,7 @@ const AdminUsers = () => {
                               className="text-red-600 hover:text-red-900"
                               onClick={() => {
                                 /* Delete action */
+                                handleDeleteClick(user?.id, user?.name);
                               }}
                             >
                               <TrashIcon className="h-5 w-5" />
@@ -422,6 +437,13 @@ const AdminUsers = () => {
         userId={editingUserId}
         onClose={() => setEditingUserId(null)}
         onUserUpdated={handleUserUpdated}
+      />
+
+      <DeleteUserModal
+        userId={deleteState.userId}
+        userName={deleteState.userName}
+        onClose={() => setDeleteState({ userId: null, userName: "" })}
+        onUserDeleted={handleUserDelte}
       />
     </div>
   );

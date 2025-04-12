@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import {  useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   ArrowLeftEndOnRectangleIcon,
@@ -7,10 +7,11 @@ import {
 } from "@heroicons/react/24/outline";
 import { useAuth } from "../context/AuthContext";
 import { navItems } from "./adminComponents/constants";
+import toast from "react-hot-toast";
 
 const AdminSidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
-  const { userData } = useAuth();
+  const { userData, logout } = useAuth();
 
   useEffect(() => {
     const handleResize = () => {
@@ -83,8 +84,11 @@ const AdminSidebar = ({ isOpen, toggleSidebar }) => {
           {/* Logout */}
           <button
             onClick={() => {
+              logout();
               navigate("/login");
               toggleSidebar();
+              toast.success("Log out sucessfully")
+
             }}
             className="w-full group flex items-center px-4 py-3 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-100 hover:text-gray-900 mt-8"
           >

@@ -28,18 +28,16 @@ export const userSignup = async (data) => {
 
 export const getAllUsers = async () => {
   try {
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
     const response = await axios.get(`${SERVER_BASE_URL}/getAllUsers`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    
-    if(response.status === 200){
+
+    if (response.status === 200) {
       return response.data.data;
     }
-
-    
   } catch (error) {
     throw error;
   }
@@ -48,16 +46,14 @@ export const getAllUsers = async () => {
 export const getUserDetails = async (id) => {
   try {
     const token = localStorage.getItem("token");
-    const response = await axios.get(
-      `${SERVER_BASE_URL}/getUserByUserId`, {
-        params: {
-          userId: id,
-        },
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await axios.get(`${SERVER_BASE_URL}/getUserByUserId`, {
+      params: {
+        userId: id,
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response;
   } catch (error) {
     console.error(
@@ -95,8 +91,18 @@ export const updateUserDetails = async (id, data) => {
 
 export const deleteUser = async (id) => {
   try {
+    const token = localStorage.getItem("token");
     const response = await axios.delete(
-      `${SERVER_BASE_URL}/deleteUserByUserId/${id}`
+      `${SERVER_BASE_URL}/deleteUserByUserId/`,
+      {
+        params: {
+          userId: id,
+        },
+
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
     return response;
   } catch (error) {
@@ -136,23 +142,20 @@ export const userProfile = async () => {
 
 export const addUser = async (data) => {
   try {
-    const token = localStorage.getItem("token")
-    const response = await axios.post(`${SERVER_BASE_URL}/addUser`, data,{
+    const token = localStorage.getItem("token");
+    const response = await axios.post(`${SERVER_BASE_URL}/addUser`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    
-    if(response.status === 200){
+
+    if (response.status === 200) {
       return response.data;
     }
-
-    
   } catch (error) {
     console.log(error);
-    
   }
-}
+};
 
 // Course related services
 export const getAllCourses = async () => {
@@ -172,5 +175,3 @@ export const getAllCourses = async () => {
     throw error;
   }
 };
-
-

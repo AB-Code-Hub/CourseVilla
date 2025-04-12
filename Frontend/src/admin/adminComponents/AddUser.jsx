@@ -189,7 +189,7 @@ const AddUser = () => {
               htmlFor="role"
               className="block text-sm font-medium text-slate-700"
             >
-              User role
+              Role
             </label>
             <select
               id="role"

@@ -228,11 +228,11 @@ const EditUserModal = ({ userId, onClose, onUserUpdated }) => {
             </div>
 
             {/* Footer with action buttons */}
-            <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 border-t border-gray-200">
+            <div className="bg-gray-50 px-4 py-3 sm:flex sm:gap-4  sm:flex-row-reverse sm:px-6 border-t border-gray-200">
               <button
                 type="submit"
                 disabled={saving}
-                className="inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-75 disabled:cursor-not-allowed"
+                className="inline-flex  justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-75 disabled:cursor-not-allowed"
               >
                 {saving ? (
                   <>
