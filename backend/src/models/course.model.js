@@ -33,7 +33,7 @@ const courseSchema = new mongoose.Schema(
       default: null,
     },
 
-    image: {
+    thumbnail: {
       type: String,
       default: null,
     },

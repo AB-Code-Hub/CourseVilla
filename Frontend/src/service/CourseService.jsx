@@ -2,7 +2,6 @@
 
 const SERVER_BASE_URL = import.meta.env.VITE_SERVER_BASE_URL;
 
-
 import axios from "axios";
 
 export const addCourse = async (data) => {
@@ -36,10 +35,27 @@ export const addCourse = async (data) => {
         })
 
         if(response.status === 200){
-            
             return response.data.data.courseList
         }
     } catch (error) {
-        throw  error
+        throw error
     }
   }
+
+  export const getCourseByCourseId = async (courseId) => {
+    try {
+        const token = localStorage.getItem('token')
+        const response = await axios.get(`${SERVER_BASE_URL}/getCourseByCourseId?courseId=${courseId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+
+        if(response.status === 200){
+            return response.data.data
+        }
+    } catch (error) {
+        throw error
+    }
+  }
+

@@ -8,11 +8,11 @@ exports.addCourseValidation = (validator) => {
         description: joi.string().required(),
         category: joi.string().required(),
         price: joi.string().required(),
-        image: joi.string().optional().allow(null).allow(""),
+        duration: joi.string().required(), 
+        thumbnail: joi.string().optional().allow(null).allow(""),
         discount: joi.string().optional().allow(null).allow(""),
         videos: joi.string().optional().allow(null).allow(""),
         topic: joi.string().optional().allow(null).allow(""),
-        duration: joi.string().optional().allow(null).allow(""), 
     })
     return addCourseValidationSchema.validate(validator)
 }

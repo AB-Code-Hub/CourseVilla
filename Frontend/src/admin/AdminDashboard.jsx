@@ -59,11 +59,11 @@ export default function AdminDashboard() {
           setUsersData(usersResponse);
         }
 
-        console.log(usersResponse);
         
 
-        if (coursesResponse?.data?.courseList) {
-          setCoursesData(coursesResponse.data.courseList);
+        if (coursesResponse) {
+          setCoursesData(coursesResponse);
+          
         }
       } catch (error) {
         toast.error("Failed to fetch dashboard data");
@@ -105,6 +105,7 @@ export default function AdminDashboard() {
             key={stat.id}
             className="bg-white overflow-hidden shadow rounded-lg"
           >
+            
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">

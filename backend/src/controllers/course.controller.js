@@ -74,7 +74,7 @@ exports.addCourse = async (req, res) => {
 exports.getAllCourses = async (req, res) => {
   try {
     const pageNo = req.query.pageNo || 1;
-    const pageSize = req.query.pageSize || 10;
+    const pageSize = req.query.pageSize || 50;
     const totalCourse = await Course.countDocuments({ isDeleted: false });
     const totalPage = Math.ceil(totalCourse / pageSize);
     const courses = await Course.find({ isDeleted: false })

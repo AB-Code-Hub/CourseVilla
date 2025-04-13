@@ -18,6 +18,7 @@ import AddUser from "./admin/adminComponents/AddUser";
 import UserDetailsModal from "./admin/adminComponents/UserDeatilsModal";
 import AddCourse from "./admin/pages/AddCourse";
 import Courses from "./admin/pages/Courses";
+import CourseDetail from "./admin/pages/CourseDetail";
 
 // Wrapper component to conditionally render Navbar
 const AppContent = () => {
@@ -52,6 +53,7 @@ const AppContent = () => {
               <Route path="users/addUser" element={ <AddUser />} />
               <Route path="courses" element={ <Courses />} />
               <Route path="courses/new" element={<AddCourse />} />
+              <Route path="courses/:id" element={<CourseDetail />} />
               {/* <Route path="users/userdetails" element={ <UserDetailsModal />} /> */}
               {/* <Route path="courses" element={<AdminCourses />} />
               <Route path="certificates" element={<AdminCertificates />} />

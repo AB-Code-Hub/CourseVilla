@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 const UserDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { userData } = useAuth()
+  
 
   return (
     <div className="relative ml-3">
@@ -14,7 +15,7 @@ const UserDropdown = () => {
         >
           <img
             className="h-8 w-8 rounded-full"
-            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+            src={userData?.user?.profilePic ||  `https://ui-avatars.com/api/?name=${userData?.user?.firstName?.charAt(0)}${userData?.user?.lastName?.charAt(0)}&background=random`}
             alt="User profile"
           />
           <span className="ml-2 text-sm font-medium text-gray-700">{userData?.user?.firstName}</span>
