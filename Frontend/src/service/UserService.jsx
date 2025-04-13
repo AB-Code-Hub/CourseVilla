@@ -26,19 +26,23 @@ export const userSignup = async (data) => {
   }
 };
 
-export const getAllUsers = async () => {
+export const getAllUsers = async (pageNo = 1, pageSize = 10, search = '') => {
   try {
     const token = localStorage.getItem("token");
     const response = await axios.get(`${SERVER_BASE_URL}/getAllUsers`, {
+      params: {
+        pageNo,
+        pageSize,
+        search
+      },
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    if (response.status === 200) {
-      return response.data.data;
-    }
+    return response.data;
   } catch (error) {
+    console.error("Error in getAllUsers:", error.response?.data || error.message);
     throw error;
   }
 };

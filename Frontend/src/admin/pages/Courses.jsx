@@ -14,6 +14,7 @@ import toast from "react-hot-toast";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import DeleteCourseModal from "../adminComponents/DeleteCourseModal";
 import { getAllCourses } from "../../service/CourseService";
+import DeleteCourse from "./DeleteCourse";
 
 const Courses = () => {
   const [courses, setCourses] = useState([]);
@@ -94,14 +95,7 @@ const Courses = () => {
 
   // Handle course deletion
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`/api/courses/${id}`);
-      setCourses(courses.filter((course) => course._id !== id));
-      toast.success("Course deleted successfully");
-      setDeleteCourse({ id: null, title: "" });
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to delete course");
-    }
+    setCourses(courses.filter((course) => course._id !== id));
   };
 
   // Refresh courses
@@ -445,8 +439,8 @@ const Courses = () => {
         </div>
       )}
 
-      {/* Delete Confirmation Modal
-      <DeleteCourseModal
+      {/* Delete Confirmation Modal */}
+      <DeleteCourse
         isOpen={!!deleteCourse.id}
         onClose={() => setDeleteCourse({ id: null, title: '' })}
         courseId={deleteCourse.id}
@@ -455,7 +449,7 @@ const Courses = () => {
           handleDelete(deleteCourse.id);
           setDeleteCourse({ id: null, title: '' });
         }}
-      /> */}
+      />
     </div>
   );
 };

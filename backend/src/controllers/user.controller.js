@@ -121,24 +121,63 @@ exports.loginUser = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const pageNo = req.query.pageNo;
-    const pageSize = req.query.pageSize;
-    const userList = await User.find({ isDeleted: false }, { password: 0 })
-      .sort({ _id: -1 })
+    const pageNo = parseInt(req.query.pageNo) || 1;
+    const pageSize = parseInt(req.query.pageSize) || 50;
+    const search = req.query.search || '';
+
+    // Build search query
+    const searchQuery = {
+      isDeleted: false,
+      $or: [
+        { firstName: { $regex: search, $options: 'i' } },
+        { lastName: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { role: { $regex: search, $options: 'i' } }
+      ]
+    };
+
+    // Get total count for pagination
+    const totalUsers = await User.countDocuments(searchQuery);
+
+    // Get paginated users
+    const userList = await User.find(searchQuery, { password: 0 })
+      .sort({ createdAt: -1 })
       .skip((pageNo - 1) * pageSize)
       .limit(pageSize);
 
     if (userList.length === 0) {
-      return res
-        .status(200)
-        .json({ success: true, message: "User not found", data: [] });
+      return res.status(200).json({
+        success: true,
+        message: "No users found",
+        data: [],
+        pagination: {
+          totalUsers,
+          currentPage: pageNo,
+          totalPages: Math.ceil(totalUsers / pageSize),
+          pageSize
+        }
+      });
     }
 
-    res
-      .status(200)
-      .json({ success: true, message: "get all list", data: userList });
+    return res.status(200).json({
+      success: true,
+      message: "Users retrieved successfully",
+      data: userList,
+      pagination: {
+        totalUsers,
+        currentPage: pageNo,
+        totalPages: Math.ceil(totalUsers / pageSize),
+        pageSize
+      }
+    });
+
   } catch (err) {
-    console.error(err);
+    console.error("Error in getAllUsers:", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: err.message
+    });
   }
 };
 

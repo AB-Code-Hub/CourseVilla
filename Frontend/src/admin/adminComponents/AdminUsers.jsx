@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
   MagnifyingGlassIcon,
@@ -12,6 +12,7 @@ import { getAllUsers } from "../../service/UserService";
 import UserDetailsModal from "./UserDeatilsModal";
 import EditUserModal from "./EditUserModal";
 import DeleteUserModal from "./DelteUserModal";
+import debounce from "lodash.debounce"; 
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -19,6 +20,8 @@ const AdminUsers = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [usersPerPage] = useState(10);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [editingUserId, setEditingUserId] = useState(null);
 
@@ -32,49 +35,56 @@ const AdminUsers = () => {
     userName: "",
   });
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        const response = await getAllUsers();
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await getAllUsers(currentPage, usersPerPage, searchTerm);
 
-        if (!response || response.length === 0) {
-          toast.error("No users found");
-          return;
-        }
-
-        // Transform API response to match the required format
-        const formattedUsers = response.map((user) => ({
-          id: user?._id,
-          name: `${user?.firstName}  ${user?.lastName}`,
-          email: user?.email,
-          role: user?.role || "user",
-          lastLogin: user.createdAt || new Date().toISOString(),
-          avatar: `https://ui-avatars.com/api/?name=${user?.firstName?.charAt(0)}${user?.lastName?.charAt(0)}&background=random`,
-        }));
-
-        setUsers(formattedUsers);
-      } catch (error) {
-        toast.error("Failed to fetch users");
-        console.error("Error fetching users:", error);
-      } finally {
-        setLoading(false);
+      if (!response || !response.data) {
+        toast.error("No users found");
+        return;
       }
-    };
 
+      // Transform API response to match the required format
+      const formattedUsers = response.data.map((user) => ({
+        id: user?._id,
+        name: `${user?.firstName} ${user?.lastName}`,
+        email: user?.email,
+        role: user?.role || "user",
+        lastLogin: user.createdAt || new Date().toISOString(),
+        avatar: `https://ui-avatars.com/api/?name=${user?.firstName?.charAt(0)}${user?.lastName?.charAt(0)}&background=random`,
+      }));
+
+      setUsers(formattedUsers);
+      setTotalUsers(response.pagination.totalUsers);
+      setTotalPages(response.pagination.totalPages);
+    } catch (error) {
+      toast.error("Failed to fetch users");
+      console.error("Error fetching users:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [currentPage, searchTerm]); // Fetch when page or search term changes
 
-  // Filter users based on search term
-  const filteredUsers = users.filter(
-    (user) =>
-      user.name?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
-      user.role?.toLowerCase().includes(searchTerm?.toLowerCase())
+  // Handle search with debounce
+  const debouncedSearch = useCallback(
+    debounce((value) => {
+      setSearchTerm(value);
+      setCurrentPage(1); // Reset to first page when searching
+    }, 1000),
+    []
   );
 
+  const handleSearchChange = (e) => {
+    debouncedSearch(e.target.value);
+  };
+
   // Sort users
-  const sortedUsers = [...filteredUsers].sort((a, b) => {
+  const sortedUsers = [...users].sort((a, b) => {
     if (a[sortConfig.key] < b[sortConfig.key]) {
       return sortConfig.direction === "asc" ? -1 : 1;
     }
@@ -84,14 +94,10 @@ const AdminUsers = () => {
     return 0;
   });
 
-  // Pagination logic
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = sortedUsers.slice(indexOfFirstUser, indexOfLastUser);
-  const totalPages = Math.ceil(sortedUsers.length / usersPerPage);
-
   // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   // Request sort
   const requestSort = (key) => {
@@ -179,8 +185,7 @@ const AdminUsers = () => {
             type="text"
             placeholder="Search users..."
             className="block w-full rounded-md border border-slate-300 bg-white py-2 pl-10 pr-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
           />
         </div>
       </div>
@@ -245,8 +250,8 @@ const AdminUsers = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 bg-white">
-                  {currentUsers.length > 0 ? (
-                    currentUsers.map((user) => (
+                  {sortedUsers.length > 0 ? (
+                    sortedUsers.map((user) => (
                       <tr key={user.id}>
                         <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                           <div className="flex items-center">
@@ -342,11 +347,11 @@ const AdminUsers = () => {
             <div>
               <p className="text-sm text-slate-700">
                 Showing{" "}
-                <span className="font-medium">{indexOfFirstUser + 1}</span> to{" "}
+                <span className="font-medium">{(currentPage - 1) * usersPerPage + 1}</span> to{" "}
                 <span className="font-medium">
-                  {Math.min(indexOfLastUser, sortedUsers.length)}
+                  {Math.min(currentPage * usersPerPage, totalUsers)}
                 </span>{" "}
-                of <span className="font-medium">{sortedUsers.length}</span>{" "}
+                of <span className="font-medium">{totalUsers}</span>{" "}
                 results
               </p>
             </div>

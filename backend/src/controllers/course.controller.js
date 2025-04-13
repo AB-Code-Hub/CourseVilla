@@ -1,6 +1,9 @@
 const User = require("../models/user.model.js");
 const Course = require("../models/course.model.js");
-const { addCourseValidation, updateCourseValidation } = require("../validation/course.validation.js");
+const {
+  addCourseValidation,
+  updateCourseValidation,
+} = require("../validation/course.validation.js");
 const { getIO } = require("../config/socket");
 
 exports.addCourse = async (req, res) => {
@@ -31,7 +34,7 @@ exports.addCourse = async (req, res) => {
       });
     }
 
-    // checking Already course created or not  
+    // checking Already course created or not
 
     const courseAlreadyExists = await Course.findOne({
       title: title,
@@ -137,27 +140,42 @@ exports.getCourseByCourseId = async (req, res) => {
 
 exports.updateCourseByCourseId = async (req, res) => {
   try {
+    const userId = req.userId;
+    const courseId = req.query.courseId;
 
-        const userId = req.userId
-        const courseId = req.query.courseId
+    const { error } = updateCourseValidation(req.body);
 
-      const { error } = updateCourseValidation(req.body)
+    if (error)
+      return res
+        .status(400)
+        .json({ success: false, message: error.details[0].message, data: {} });
 
-      if(error) return res.status(400).json({success: false, message: error.details[0].message, data: {}})
+    const userRole = await User.findOne({ _id: userId, isDeleted: false });
 
-        const userRole = await User.findOne({ _id: userId, isDeleted: false })
+    if (userRole.role === "user") {
+      return res
+        .status(403)
+        .json({ success: false, message: "Access Denied", data: {} });
+    }
 
-        if(userRole.role === "user"){
-            return res.status(403).json({success: false, message: "Access Denied", data: {}})
-        }
+    const updateCourseInfo = await Course.findOneAndUpdate(
+      { _id: courseId, isDeleted: false },
+      req.body,
+      { new: true }
+    );
 
+    if (!updateCourseInfo)
+      return res
+        .status(403)
+        .json({ success: false, message: "Can't update details", data: {} });
 
-        const updateCourseInfo = await Course.findOneAndUpdate({_id: courseId, isDeleted: false, }, req.body, {new: true})
-
-        if(!updateCourseInfo) return res.status(403).json({success: false, message: "Can't update details", data: {}})
-
-          return res.status(200).json({success: true, message: "Details updated successsfully", data: updateCourseInfo})
-
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: "Details updated successsfully",
+        data: updateCourseInfo,
+      });
   } catch (error) {
     console.error("Error in updateUserByUserId controller", error);
     return res
@@ -167,37 +185,38 @@ exports.updateCourseByCourseId = async (req, res) => {
 };
 
 exports.deleteCourseByCourseId = async (req, res) => {
-  try {     
-          const userId = req.userId;
-          const courseId = req.query.courseId;
+  try {
+    const userId = req.userId;
+    const courseId = req.query.courseId;
 
-          const userRole = await User.findOne({_id: userId, isDeleted: false}, {role: 1})
+    const userRole = await User.findOne(
+      { _id: userId, isDeleted: false },
+      { role: 1 }
+    );
 
+    if (userRole.role !== "admin") {
+      return res.status(403).json({ success: false, message: "Access Denied" });
+    }
 
-          if(userRole.role !== "admin"){
-            return res.status(403).json({success: false, message: "Access Denied"})
-          }
+    const deleteCourseInfo = await Course.findOneAndUpdate(
+      { _id: courseId, isDeleted: false },
+      { $set: { isDeleted: true } },
+      { new: true }
+    );
 
-            const deleteCourseInfo = await Course.findOneAndUpdate(
-            { _id: courseId, isDeleted: false },
-            { $set: { isDeleted: true } },
-            { new: true }
-            );
+    if (!deleteCourseInfo) {
+      return res.status(400).json({
+        success: false,
+        message: "Course not found or already deleted",
+        data: {},
+      });
+    }
 
-            if (!deleteCourseInfo) {
-            return res.status(400).json({
-              success: false,
-              message: "Course not found or already deleted",
-              data: {},
-            });
-            }
-
-            return res.status(200).json({
-            success: true,
-            message: "Course deleted successfully",
-            data: deleteCourseInfo,
-            });
-
+    return res.status(200).json({
+      success: true,
+      message: "Course deleted successfully",
+      data: deleteCourseInfo,
+    });
   } catch (error) {
     console.error("Error in deleteUserByUserId controller", error);
     return res
@@ -205,7 +224,3 @@ exports.deleteCourseByCourseId = async (req, res) => {
       .json({ message: "Internal server error", error: error.message });
   }
 };
-
-
-
-

@@ -19,14 +19,15 @@ exports.addCourseValidation = (validator) => {
 
 exports.updateCourseValidation = (validator) => {
     const updateCourseValidationSchema = joi.object({
-        name: joi.string().optional().allow(null).allow(""),
+        title: joi.string().optional().allow(null).allow(""),
         description: joi.string().optional().allow(null).allow(""),
         price: joi.string().optional().allow(null).allow(""),
-        image: joi.string().optional().allow(null).allow(""),
+        thumbnail: joi.string().optional().allow(null).allow(""),
         discount: joi.string().optional().allow(null).allow(""),
         videos: joi.string().optional().allow(null).allow(""),
-        topics: joi.string().optional().allow(null).allow(""),
-        duration: joi.array().optional().allow(null).allow(""),
+        topic: joi.string().optional().allow(null).allow(""),
+        duration: joi.string().optional().allow(null).allow(""),
+        category: joi.string().optional().allow(null).allow(""),
     })
     return updateCourseValidationSchema.validate(validator)
 }

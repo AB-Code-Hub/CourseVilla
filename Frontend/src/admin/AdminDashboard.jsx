@@ -76,11 +76,14 @@ export default function AdminDashboard() {
     fetchData();
   }, []);
 
+  console.log(usersData);
+  
+
   const stats = [
     {
       id: 1,
       name: "Total Students",
-      value: isLoading ? <LoadingSpinner /> : usersData?.length || 0,
+      value: isLoading ? <LoadingSpinner /> : usersData?.data?.length || 0,
       icon: UsersIcon,
       change: "+12%",
       changeType: "increase",
