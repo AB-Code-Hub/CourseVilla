@@ -20,6 +20,7 @@ import AddCourse from "./admin/pages/AddCourse";
 import Courses from "./admin/pages/Courses";
 import CourseDetail from "./admin/pages/CourseDetail";
 import EditCourse from "./admin/pages/EditCourse";
+import Settings from "./admin/pages/Settings";
 
 // Wrapper component to conditionally render Navbar
 const AppContent = () => {
@@ -56,11 +57,8 @@ const AppContent = () => {
               <Route path="courses/new" element={<AddCourse />} />
               <Route path="courses/:id" element={<CourseDetail />} />
               <Route path="courses/:id/edit" element={<EditCourse />} />
-              {/* <Route path="users/userdetails" element={ <UserDetailsModal />} /> */}
-              {/* <Route path="courses" element={<AdminCourses />} />
-              <Route path="certificates" element={<AdminCertificates />} />
-              <Route path="instructors" element={<AdminInstructors />} />
-              <Route path="settings" element={<AdminSettings />} /> */}
+              <Route path="settings" element={<Settings />} />
+              
             </Route>
           </Route>
 

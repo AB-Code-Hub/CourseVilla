@@ -22,7 +22,6 @@ export const navItems = [
     icon: DocumentTextIcon,
     path: "/admin/certificates",
   },
-  { name: "Instructors", icon: AcademicCapIcon, path: "/admin/instructors" },
   { name: "Settings", icon: CogIcon, path: "/admin/settings" },
   { name: "User Home", icon: HomeIcon, path: "/" },
 ];
