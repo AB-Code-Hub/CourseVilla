@@ -7,7 +7,7 @@ exports.addCourse = async (req, res) => {
   try {
     // add validation
     const userId = req.userId;
-    const name = req.body.name?.toLowerCase();
+    const title = req.body.title?.toLowerCase();
     const { error } = addCourseValidation(req.body);
     if (error) {
       return res
@@ -34,7 +34,7 @@ exports.addCourse = async (req, res) => {
     // checking Already course created or not  
 
     const courseAlreadyExists = await Course.findOne({
-      name: name,
+      title: title,
       isDeleted: false,
     });
 
@@ -44,7 +44,7 @@ exports.addCourse = async (req, res) => {
         .json({ success: false, message: "Course already exists", data: {} });
     }
     // save course
-    req.body.name = name;
+    req.body.title = title;
     req.body.userId = userId;
     const courseSave = await Course.create(req.body);
 
@@ -55,14 +55,6 @@ exports.addCourse = async (req, res) => {
         data: {},
       });
     }
-
-    // Emit new course event
-    const io = getIO();
-    io.emit('newCourse', {
-      course: courseSave.title,
-      action: 'created',
-      time: new Date().toISOString()
-    });
 
     return res.status(201).json({
       success: true,

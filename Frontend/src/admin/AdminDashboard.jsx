@@ -4,10 +4,12 @@ import {
   BookOpenIcon,
   AcademicCapIcon,
 } from "@heroicons/react/24/outline";
-import { getAllCourses, getAllUsers } from "../service/UserService";
+import {  getAllUsers } from "../service/UserService";
+import { getAllCourses } from "../service/CourseService";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { Link } from "react-router-dom";
 const recentActivities = [
   {
     id: 1,
@@ -189,9 +191,9 @@ export default function AdminDashboard() {
           </h3>
         </div>
         <div className="px-6 py-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          <Link to='/admin/courses/new' className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
             Add New Course
-          </button>
+          </Link>
           <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             Invite Instructor
           </button>

@@ -8,7 +8,7 @@ const courseSchema = new mongoose.Schema(
       default: null,
     },
 
-    name: {
+    title: {
       type: String,
       default: null,
     },
@@ -24,7 +24,12 @@ const courseSchema = new mongoose.Schema(
 
     category: {
       type: String,
-      enum: ['Development', 'Design', 'Business', 'Marketing'],
+      enum: [  'Web Development',
+        'Mobile Development',
+        'Data Science',
+        'Design',
+        'Business',
+        'Marketing'],
       default: null,
     },
 
@@ -44,7 +49,7 @@ const courseSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-    topics: {
+    topic: {
       type: String,
       default: null,
     },

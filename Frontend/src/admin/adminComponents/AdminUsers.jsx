@@ -254,7 +254,7 @@ const AdminUsers = () => {
                               <img
                                 className="h-10 w-10 rounded-full"
                                 src={user.avatar}
-                                alt=""
+                                alt={user.name}
                               />
                             </div>
                             <div className="ml-4">

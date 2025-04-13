@@ -157,21 +157,4 @@ export const addUser = async (data) => {
   }
 };
 
-// Course related services
-export const getAllCourses = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    const response = await axios.get(`${SERVER_BASE_URL}/getAllCourses`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error(
-      "Error in getAllCourses:",
-      error.response?.data || error.message
-    );
-    throw error;
-  }
-};
+

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Courses from "../components/Courses";
-import { getAllCourses } from "../service/UserService";
+import { getAllCourses } from "../service/CourseService";
 
 const Home = () => {
   const [courses, setCourses] = useState([]);
@@ -11,8 +11,8 @@ const Home = () => {
     const fetchCourses = async () => {
       try {
         const response = await getAllCourses();
-        if (response.success) {
-          setCourses(response.data.courseList || []);
+        if (response) {
+          setCourses(response || []);
         } else {
           setError(response.message || 'Failed to fetch courses');
         }
