@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import PrivateRoute from "./components/PrivateRoute";
+import PublicRoute from "./components/PublicRoute";
 import Navbar from "./components/Navbar";
 import Login from "./auth/Login";
 import Signup from "./auth/Signup";
@@ -15,12 +16,10 @@ import AdminDashboard from "./admin/AdminDashboard";
 import AdminLayout from "./admin/AdminLayout";
 import AdminUsers from "./admin/adminComponents/AdminUsers";
 import AddUser from "./admin/adminComponents/AddUser";
-import UserDetailsModal from "./admin/adminComponents/UserDeatilsModal";
 import AddCourse from "./admin/pages/AddCourse";
 import Courses from "./admin/pages/Courses";
 import CourseDetail from "./admin/pages/CourseDetail";
 import EditCourse from "./admin/pages/EditCourse";
-import Settings from "./admin/pages/AdminSettings";
 import AdminProfile from "./admin/pages/AdminProfile";
 import AdminSettings from "./admin/pages/AdminSettings";
 import CertificateGenerator from "./admin/pages/CertificateGenerator";
@@ -31,16 +30,16 @@ const AppContent = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
 
-  
-
   return (
     <div className="min-h-screen bg-slate-50">
       {!isAdminRoute && <Navbar />}
       <main className={!isAdminRoute ? "pt-20 pb-10" : ""}>
         <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          {/* Public Routes - only accessible when NOT authenticated */}
+          <Route element={<PublicRoute />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+          </Route>
 
           {/* Protected Routes (for all authenticated users) */}
           <Route element={<PrivateRoute />}>

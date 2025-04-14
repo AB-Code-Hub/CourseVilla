@@ -378,7 +378,7 @@ const AdminProfile = () => {
                       </>
                     ) : (
                       <motion.p 
-                        className="text-lg font-medium text-gray-900"
+                        className="text-lg capitalize font-medium text-gray-900"
                         animate={{
                           color: hoveredField === 'name' ? '#3B82F6' : '#111827'
                         }}
