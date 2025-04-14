@@ -14,7 +14,7 @@ const Home = () => {
         if (response) {
           setCourses(response || []);
         } else {
-          setError(response.message || 'Failed to fetch courses');
+          setError(response?.message || 'Failed to fetch courses or courses not avialable');
         }
       } catch (error) {
         console.error('Error fetching courses:', error);

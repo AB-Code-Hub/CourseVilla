@@ -33,7 +33,7 @@ export const addCourse = async (data) => {
                 Authorization: `Bearer ${token}`
             }
         })
-
+          
         if(response.status === 200){
             return response.data.data.courseList
         }

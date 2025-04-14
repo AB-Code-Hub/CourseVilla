@@ -22,6 +22,6 @@ export const navItems = [
     icon: DocumentTextIcon,
     path: "/admin/certificates",
   },
-  { name: "Settings", icon: CogIcon, path: "/admin/settings" },
+  { name: "Settings", icon: CogIcon, path: "/admin/adminsettings" },
   { name: "User Home", icon: HomeIcon, path: "/" },
 ];
