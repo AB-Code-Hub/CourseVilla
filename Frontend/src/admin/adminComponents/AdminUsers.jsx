@@ -23,7 +23,7 @@ const AdminUsers = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [usersPerPage] = useState(10);
+  const [pageSize] = useState(10);
   const [totalUsers, setTotalUsers] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -71,10 +71,10 @@ const AdminUsers = () => {
     }
   };
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async (page, size, search) => {
     try {
       setLoading(true);
-      const response = await getAllUsers(currentPage, usersPerPage, searchTerm);
+      const response = await getAllUsers(page, size, search);
 
       if (!response || !response.data) {
         toast.error("No users found");
@@ -106,24 +106,31 @@ const AdminUsers = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchUsers();
-  }, [currentPage, searchTerm]);
+    fetchUsers(currentPage, pageSize, searchTerm);
+  }, [currentPage, pageSize, fetchUsers]);
 
   // Handle search with debounce
   const debouncedSearch = useCallback(
     debounce((value) => {
       setSearchTerm(value);
       setCurrentPage(1);
+      fetchUsers(1, pageSize, value);
     }, 500),
-    []
+    [fetchUsers, pageSize]
   );
 
   const handleSearchChange = (e) => {
     debouncedSearch(e.target.value);
   };
+
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
 
   // Sort users
   const sortedUsers = [...users].sort((a, b) => {
@@ -201,7 +208,7 @@ const AdminUsers = () => {
    
   };
 
-  if (loading) return <LoadingSpinner fullScreen />;
+  if (loading && !users.length) return <LoadingSpinner fullScreen />;
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
@@ -420,9 +427,9 @@ const AdminUsers = () => {
                 <div>
                   <p className="text-sm text-slate-700">
                     Showing{" "}
-                    <span className="font-medium">{(currentPage - 1) * usersPerPage + 1}</span> to{" "}
+                    <span className="font-medium">{(currentPage - 1) * pageSize + 1}</span> to{" "}
                     <span className="font-medium">
-                      {Math.min(currentPage * usersPerPage, totalUsers)}
+                      {Math.min(currentPage * pageSize, totalUsers)}
                     </span>{" "}
                     of <span className="font-medium">{totalUsers}</span>{" "}
                     results

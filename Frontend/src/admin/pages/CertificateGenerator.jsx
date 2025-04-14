@@ -112,7 +112,7 @@ const CertificateGenerator = () => {
     setGenerating(true);
     try {
       const canvas = await html2canvas(certificateRef.current, {
-        scale: 1, // Reduced scale for better performance
+        scale: 3, // Reduced scale for better performance
         logging: false,
         useCORS: true,
         backgroundColor: '#ffffff'
@@ -150,7 +150,7 @@ const CertificateGenerator = () => {
     setGenerating(true);
     try {
       const canvas = await html2canvas(certificateRef.current, {
-        scale: 1,
+        scale: 3,
         logging: false,
         useCORS: true,
         backgroundColor: '#ffffff'

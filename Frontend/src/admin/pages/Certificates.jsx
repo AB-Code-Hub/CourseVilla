@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   MagnifyingGlassIcon,
@@ -6,6 +6,7 @@ import {
   UserIcon
 } from '@heroicons/react/24/outline';
 import { motion, AnimatePresence } from 'framer-motion';
+import debounce from 'lodash.debounce';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { getAllUsers } from '../../service/UserService';
@@ -17,6 +18,10 @@ const Certificates = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const navigate = useNavigate();
 
   // Animation variants
@@ -45,37 +50,59 @@ const Certificates = () => {
     }
   };
 
-  // Fetch users
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        const response = await getAllUsers();
-        
-        setUsers(response.data);
-        setLoading(false);
-      } catch (error) {
-        toast.error('Failed to load users', {
-          position: 'top-right',
-          duration: 3000,
-          style: {
-            background: '#EF4444',
-            color: '#fff',
-          }
-        });
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
+  // Fetch users with pagination
+  const fetchUsers = useCallback(async (page, size, search) => {
+    try {
+      setLoading(true);
+      const response = await getAllUsers(page, size, search);
+      setUsers(response.data);
+      setTotalUsers(response.pagination.totalUsers);
+      setTotalPages(response.pagination.totalPages);
+    } catch (error) {
+      toast.error('Failed to load users', {
+        position: 'top-right',
+        duration: 3000,
+        style: {
+          background: '#EF4444',
+          color: '#fff',
+        }
+      });
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  // Filter users based on search term
-  const filteredUsers = Array.isArray(users) ? users.filter(user =>
-    `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  ) : [];
-  
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    debounce((searchValue) => {
+      setCurrentPage(1);
+      fetchUsers(1, pageSize, searchValue);
+    }, 300),
+    [fetchUsers, pageSize]
+  );
+
+  // Initial load and page change effect
+  useEffect(() => {
+    fetchUsers(currentPage, pageSize, searchTerm);
+  }, [currentPage, pageSize, fetchUsers]);
+
+  // Search input change handler
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    debouncedSearch(value);
+  };
+
+  // Cleanup debounce on component unmount
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   const handleGenerateCertificate = (user) => {
     setSelectedUser(user);
@@ -87,7 +114,7 @@ const Certificates = () => {
     setShowConfirmModal(false);
   };
 
-  if (loading) return <LoadingSpinner fullScreen />;
+  if (loading && !users.length) return <LoadingSpinner fullScreen />;
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-8 max-w-7xl mx-auto">
@@ -121,7 +148,7 @@ const Certificates = () => {
                 placeholder="Search users..."
                 className="block w-full rounded-md border border-slate-300 bg-white py-2 pl-10 pr-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={handleSearch}
               />
             </div>
           </motion.div>
@@ -134,54 +161,125 @@ const Certificates = () => {
               </h2>
             </div>
 
-            <ul className="divide-y divide-slate-200">
-              {filteredUsers.length > 0 ? (
-                filteredUsers.map((user) => (
-                  <motion.li 
-                    key={user._id}
-                    variants={itemVariants}
-                    whileHover={{ backgroundColor: '#f8fafc' }}
-                    className="px-6 py-4"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="h-10 w-10 flex-shrink-0">
-                          <img
-                            className="h-10 w-10 rounded-full"
-                            src={user.avatar || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=random`}
-                            alt={`${user.firstName} ${user.lastName}`}
-                          />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-slate-900">
-                            {user.firstName} {user.lastName}
+            {loading && users.length > 0 ? (
+              <div className="flex justify-center items-center py-4">
+                <LoadingSpinner />
+              </div>
+            ) : (
+              <ul className="divide-y divide-slate-200">
+                {users.length > 0 ? (
+                  users.map((user) => (
+                    <motion.li 
+                      key={user._id}
+                      variants={itemVariants}
+                      whileHover={{ backgroundColor: '#f8fafc' }}
+                      className="px-6 py-4"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <div className="h-10 w-10 flex-shrink-0">
+                            <img
+                              className="h-10 w-10 rounded-full"
+                              src={user.avatar || `https://ui-avatars.com/api/?name=${user.firstName}+${user.lastName}&background=random`}
+                              alt={`${user.firstName} ${user.lastName}`}
+                            />
                           </div>
-                          <div className="text-sm text-slate-500">
-                            {user.email}
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-slate-900">
+                              {user.firstName} {user.lastName}
+                            </div>
+                            <div className="text-sm text-slate-500">
+                              {user.email}
+                            </div>
                           </div>
                         </div>
+                        <motion.button
+                          onClick={() => handleGenerateCertificate(user)}
+                          className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <DocumentTextIcon className="-ml-1 mr-2 h-5 w-5" />
+                          Generate Certificate
+                        </motion.button>
                       </div>
-                      <motion.button
-                        onClick={() => handleGenerateCertificate(user)}
-                        className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <DocumentTextIcon className="-ml-1 mr-2 h-5 w-5" />
-                        Generate Certificate
-                      </motion.button>
-                    </div>
+                    </motion.li>
+                  ))
+                ) : (
+                  <motion.li 
+                    variants={itemVariants}
+                    className="px-6 py-4 text-center text-sm text-slate-500"
+                  >
+                    No users found
                   </motion.li>
-                ))
-              ) : (
-                <motion.li 
-                  variants={itemVariants}
-                  className="px-6 py-4 text-center text-sm text-slate-500"
-                >
-                  No users found
-                </motion.li>
-              )}
-            </ul>
+                )}
+              </ul>
+            )}
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                <div className="flex-1 flex justify-between sm:hidden">
+                  <button
+                    onClick={() => paginate(currentPage - 1)}
+                    disabled={currentPage === 1 || loading}
+                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => paginate(currentPage + 1)}
+                    disabled={currentPage === totalPages || loading}
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                </div>
+                <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm text-gray-700">
+                      Showing <span className="font-medium">{((currentPage - 1) * pageSize) + 1}</span> to{' '}
+                      <span className="font-medium">
+                        {Math.min(currentPage * pageSize, totalUsers)}
+                      </span>{' '}
+                      of <span className="font-medium">{totalUsers}</span> results
+                    </p>
+                  </div>
+                  <div>
+                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                      <button
+                        onClick={() => paginate(currentPage - 1)}
+                        disabled={currentPage === 1 || loading}
+                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Previous
+                      </button>
+                      {[...Array(totalPages)].map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => paginate(index + 1)}
+                          disabled={loading}
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                            currentPage === index + 1
+                              ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                          } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                          {index + 1}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => paginate(currentPage + 1)}
+                        disabled={currentPage === totalPages || loading}
+                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Next
+                      </button>
+                    </nav>
+                  </div>
+                </div>
+              </div>
+            )}
           </motion.div>
         </motion.div>
       </AnimatePresence>
