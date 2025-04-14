@@ -23,6 +23,8 @@ import EditCourse from "./admin/pages/EditCourse";
 import Settings from "./admin/pages/AdminSettings";
 import AdminProfile from "./admin/pages/AdminProfile";
 import AdminSettings from "./admin/pages/AdminSettings";
+import CertificateGenerator from "./admin/pages/CertificateGenerator";
+import Certificates from "./admin/pages/Certificates";
 
 // Wrapper component to conditionally render Navbar
 const AppContent = () => {
@@ -61,6 +63,8 @@ const AppContent = () => {
               <Route path="courses/:id/edit" element={<EditCourse />} />
               <Route path="adminsettings" element={<AdminSettings />} />
               <Route path="profile" element={<AdminProfile />} />
+              <Route path="certificates/users" element={ <Certificates />} />
+              <Route path="certificates/generate/:userId" element ={<CertificateGenerator />} />
               
             </Route>
           </Route>

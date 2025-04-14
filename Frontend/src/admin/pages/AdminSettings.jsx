@@ -6,8 +6,6 @@ import {
   ShieldCheckIcon,
   BellIcon,
   CreditCardIcon,
-  MoonIcon,
-  SunIcon,
   CheckIcon
 } from '@heroicons/react/24/outline';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -229,26 +227,7 @@ const AdminSettings = () => {
                         transition={{ duration: 0.2 }}
                         className="space-y-6"
                       >
-                        <div className="flex items-start">
-                          <div className="flex h-5 items-center">
-                            <input
-                              id="darkMode"
-                              name="darkMode"
-                              type="checkbox"
-                              checked={formData.darkMode}
-                              onChange={handleChange}
-                              className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                            />
-                          </div>
-                          <div className="ml-3 text-sm">
-                            <label htmlFor="darkMode" className="font-medium text-slate-700">
-                              Dark Mode
-                            </label>
-                            <p className="text-slate-500">
-                              Switch between light and dark theme
-                            </p>
-                          </div>
-                        </div>
+                        
 
                         <div>
                           <label htmlFor="language" className="block text-sm font-medium text-slate-700 mb-1">

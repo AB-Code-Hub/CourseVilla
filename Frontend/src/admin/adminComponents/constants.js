@@ -20,7 +20,7 @@ export const navItems = [
   {
     name: "Certificates",
     icon: DocumentTextIcon,
-    path: "/admin/certificates",
+    path: "/admin/certificates/users",
   },
   { name: "Settings", icon: CogIcon, path: "/admin/adminsettings" },
   { name: "User Home", icon: HomeIcon, path: "/" },
